@@ -18,6 +18,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--dir", "client", "dev", "--port", "5173", "--strictPort"],
       "port": 5173
+    },
+    {
+      "name": "client-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "client", "preview", "--port", "4173", "--strictPort"],
+      "port": 4173
     }
   ]
 }

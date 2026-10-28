@@ -3,7 +3,7 @@ import { Readable } from "node:stream"
 
 import type { Connect, Plugin } from "vite"
 
-import { handleBotApi, type BotApiConfig } from "./bot-api"
+import { handleBotApi, type BotApiConfig } from "./bot-api.ts"
 
 /** Serves the bot API from `vite dev` and `vite preview`. */
 export function botApi(config: BotApiConfig): Plugin {
