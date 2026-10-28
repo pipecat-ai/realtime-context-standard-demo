@@ -25,7 +25,7 @@ export function Mood({ className }: { className?: string }) {
   const color = moodColor(value)
 
   return (
-    <Panel title="caller mood" right="0–100" className={className}>
+    <Panel title="caller mood" className={className}>
       <div className="flex min-w-0 items-center gap-3 px-4 pb-4 font-mono text-xs">
         <span className="w-20 shrink-0 font-bold uppercase" style={{ color }}>
           {word}

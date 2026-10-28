@@ -1,5 +1,6 @@
 import type { TransportState } from "@pipecat-ai/client-js"
 import { usePipecatClientTransportState } from "@pipecat-ai/client-react"
+import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
 
 import { BotVoiceBars } from "@/components/bot-voice-bars"
@@ -23,6 +24,14 @@ const OUTLINE_PILL =
 /** States the call button can start a session from. */
 const CONNECTABLE: TransportState[] = ["initialized", "disconnected", "error"]
 
+/** A fade only, which reduced motion keeps. */
+const FADE = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.2 },
+}
+
 interface StageProps {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
@@ -39,9 +48,12 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
 
   return (
     <div className={cn("flex min-h-0 flex-col gap-3", className)}>
+      {/* Below lg a band of the screen, 30% of its height but never short
+          of the call button, leaving the rest to the panels; beside them,
+          all the height there is. */}
       <section
         aria-label="Voice agent"
-        className="on-ambient flex min-h-0 flex-1 flex-col overflow-hidden rounded-[28px] bg-card"
+        className="on-ambient flex h-[30dvh] min-h-40 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1"
       >
         <AmbientBackground
           palette={ambientPalette(paletteId)}
@@ -68,18 +80,29 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
           />
         </AmbientBackground>
       </section>
-      <footer className="flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <UserAudioControl variant="ghost" size="lg" />
-          <BotAudioControl
-            size="icon-lg"
-            variant="outline"
-            align="center"
-            sliderProps={{ orientation: "vertical" }}
-            className={OUTLINE_PILL}
-          />
-          <SessionOptions disabled={!connectable} />
-        </div>
+      <footer className="flex min-h-12 shrink-0 flex-wrap items-center gap-3">
+        <UserAudioControl variant="ghost" size="lg" />
+        <BotAudioControl
+          size="icon-lg"
+          variant="outline"
+          align="center"
+          sliderProps={{ orientation: "vertical" }}
+          className={OUTLINE_PILL}
+        />
+        {/* The bot reads them at the start of a session, so they're gone
+            while one is up. Below lg, on a row of their own under the
+            audio controls and palette. */}
+        <AnimatePresence initial={false}>
+          {connectable && (
+            <motion.div
+              key="session-options"
+              {...FADE}
+              className="max-lg:order-last max-lg:w-full"
+            >
+              <SessionOptions />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <PalettePicker
           value={paletteId}
           onChange={setPaletteId}

@@ -11,13 +11,12 @@ import { sessionOptions } from "@/lib/session-config"
 import { useSessionStore } from "@/stores/session-store"
 
 /**
- * Stacked under the stage below lg. Beside it, the panel takes 38% of the
- * window: at least 26rem, so the stage keeps the larger share on laptops, and
- * at most 48rem, so wide displays give the transcript room without starving
- * the stage.
+ * Below lg, the rest of the screen under the stage. Beside it, the panel
+ * takes 38% of the window: at least 26rem, so the stage keeps the larger
+ * share on laptops, and at most 48rem, so wide displays give the transcript
+ * room without starving the stage.
  */
-const SIDE_PANEL =
-  "h-[85dvh] lg:h-full lg:w-[clamp(26rem,38vw,48rem)] lg:shrink-0"
+const SIDE_PANEL = "flex-1 lg:w-[clamp(26rem,38vw,48rem)] lg:flex-none"
 
 interface SessionProps {
   connect: () => Promise<void>
@@ -25,15 +24,19 @@ interface SessionProps {
   error: string | null
 }
 
-/** The stage on the left; the transcript, tool calls and metrics on the right. */
+/**
+ * One screen, never scrolled: the stage on the left and the transcript, mood,
+ * tool calls and metrics on the right, or below lg, the stage over the panel
+ * the tab bar picks.
+ */
 function Session(props: SessionProps) {
   useExpressionEvents()
 
   return (
-    <div className="flex min-h-dvh flex-col gap-3 p-3 sm:p-4 lg:h-dvh lg:flex-row">
-      <div className="flex h-[calc(100dvh-1.5rem)] min-h-0 min-w-0 flex-col gap-3 lg:h-full lg:flex-1">
+    <div className="flex h-dvh flex-col gap-3 p-3 sm:p-4 lg:flex-row">
+      <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-1">
         <Header className="h-10" />
-        <Stage {...props} className="flex-1" />
+        <Stage {...props} className="lg:flex-1" />
       </div>
       <SidePanel className={SIDE_PANEL} />
     </div>

@@ -180,8 +180,9 @@ export function Transcript({ className }: { className?: string }) {
       }
       className={className}
     >
-      {/* Column-reversed, so the scroll stays pinned to the newest line. */}
-      <div className="flex min-h-0 flex-1 flex-col-reverse overflow-y-auto px-4 pb-4">
+      {/* Column-reversed, so the scroll stays pinned to the newest line; older
+          lines fade out towards the top. */}
+      <div className="flex min-h-0 flex-1 flex-col-reverse overflow-y-auto mask-t-from-75% px-4 pb-4">
         {turns.length ? (
           <ol aria-live="polite" className="flex flex-col gap-3">
             {turns.map((message) => (

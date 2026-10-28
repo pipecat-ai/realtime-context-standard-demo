@@ -15,8 +15,8 @@ const ITEM = "aria-pressed:bg-primary aria-pressed:text-primary-foreground"
 const isTts = (value: unknown): value is TtsChoice =>
   value === "elevenlabs" || value === "cartesia"
 
-/** The bot's start-time options; fixed while a session is up. */
-export function SessionOptions({ disabled }: { disabled: boolean }) {
+/** The bot's start-time options. */
+export function SessionOptions() {
   const tts = useSessionStore((state) => state.tts)
   const useTagger = useSessionStore((state) => state.useTagger)
   const setTts = useSessionStore((state) => state.setTts)
@@ -28,7 +28,6 @@ export function SessionOptions({ disabled }: { disabled: boolean }) {
         aria-label="Text-to-speech"
         variant="outline"
         size="sm"
-        disabled={disabled}
         value={[tts]}
         onValueChange={([value]) => {
           if (isTts(value)) setTts(value)
@@ -44,7 +43,6 @@ export function SessionOptions({ disabled }: { disabled: boolean }) {
         aria-label="Expression tags"
         variant="outline"
         size="sm"
-        disabled={disabled}
         value={[useTagger ? "tagger" : "llm"]}
         onValueChange={([value]) => {
           if (value) setUseTagger(value === "tagger")
