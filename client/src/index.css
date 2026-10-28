@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./glass/glass-button.css";
+@import "./styles/meters.css";
+@import "./styles/kit.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Variable faces from Fontsource, imported in main.tsx. */
+  --font-heading: var(--font-sans);
+  --font-sans: "Work Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Azeret Mono Variable", ui-monospace, monospace;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-active: var(--active-background);
+  --color-active-foreground: var(--active-foreground);
+  --color-inactive: var(--inactive-background);
+  --color-inactive-foreground: var(--inactive-foreground);
+  --color-agent: var(--agent);
+  --color-client: var(--client);
+  --color-tool: var(--tool);
+  --color-faint: var(--faint);
+  --color-warm: var(--warm);
+  --color-neutral: var(--neutral);
+  --color-cold: var(--cold);
+  --color-hostile: var(--hostile);
+  --color-sarcasm: var(--sarcasm);
+  --color-tag-delivery: var(--tag-delivery);
+  --color-tag-speed: var(--tag-speed);
+  --color-tag-emphasis: var(--tag-emphasis);
+  --color-tag-breath: var(--tag-breath);
+  --color-tag-sound: var(--tag-sound);
+  --color-tag-pause: var(--tag-pause);
+  /* A tool's cell lights up with each call and fades back. */
+  --animate-tool-flash: tool-flash 0.7s ease-out;
+
+  @keyframes tool-flash {
+    from {
+      background-color: color-mix(
+        in oklab,
+        var(--active-background) 25%,
+        transparent
+      );
+    }
+  }
+  /* The mic control's push-to-talk ring, from the Pipecat UI registry. */
+  --animate-ptt-pulse: ptt-pulse 1.5s ease-in-out infinite;
+
+  @keyframes ptt-pulse {
+    50% {
+      outline-color: color-mix(
+        in oklab,
+        var(--active-background) 30%,
+        transparent
+      );
+    }
+  }
+}
+
+/* Dark only (<html class="dark"> keeps the kit's dark: variants).
+
+   Accents: agent (lavender) the bot, client (blue) the user, active (green)
+   live, inactive (pink) stop, tool (amber) tool calls. Meaning: warm,
+   neutral, cold and hostile say how a reading feels, sarcasm marks a line
+   that means something else. */
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #141414;
+  --card-foreground: #ededed;
+  --popover: #141414;
+  --popover-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1f1f1f;
+  --secondary-foreground: #ededed;
+  --muted: #1a1a1a;
+  --muted-foreground: #949494;
+  --faint: #5c5c5c;
+  --accent: #1f1f1f;
+  --accent-foreground: #ededed;
+  --destructive: #f7768e;
+  --border: #262626;
+  --input: #262626;
+  --ring: #4a4a4a;
+  --radius: 0.75rem;
+  --active-background: #9ece6a;
+  --active-foreground: #0a0a0a;
+  --inactive-background: #f7768e;
+  --inactive-foreground: #0a0a0a;
+  --agent: #bb9af7;
+  --client: #7aa2f7;
+  --tool: #e0af68;
+  --warm: #a6e35f;
+  --neutral: #8a91c4;
+  --cold: #f0b45c;
+  --hostile: #ff5f7a;
+  --sarcasm: #5eead4;
+  /* Expression tags in the tagged line, one colour per kind of tag. */
+  --tag-delivery: #bb9af7;
+  --tag-speed: #7dcfff;
+  --tag-emphasis: #ff9e64;
+  --tag-breath: #73daca;
+  --tag-sound: #e0af68;
+  --tag-pause: var(--faint);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Over the ambient background: white text, and borders and fills that let
+   the palette show through. */
+.on-ambient {
+  --foreground: #ffffff;
+  --muted-foreground: rgb(255 255 255 / 0.72);
+  --border: rgb(255 255 255 / 0.2);
+  --input: rgb(255 255 255 / 0.2);
+  --muted: rgb(0 0 0 / 0.18);
+  color: var(--foreground);
+}

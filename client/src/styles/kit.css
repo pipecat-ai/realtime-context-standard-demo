@@ -1,0 +1,117 @@
+/*
+ * The Deepgram demo's look for the vendored kit (components/ui,
+ * components/pipecat), set on their data-slots so they follow without edits.
+ * Unlayered, so these win over the kit's Tailwind utilities.
+ */
+
+/* Buttons are pills in the mono face. The volume control is a kit button
+   under its own slot. In a button group the group is the pill, so its
+   buttons keep the group's square inner corners. */
+[data-slot="button"],
+[data-slot="bot-audio-control"] {
+  font-family: var(--font-mono);
+}
+
+[data-slot="button"]:not([data-slot="button-group"] > *),
+[data-slot="bot-audio-control"] {
+  border-radius: 9999px;
+}
+
+/* The mic control (ghost buttons in a group): one outline pill as tall as
+   the volume button, pink while muted, a soft divider before the device
+   chevron. */
+[data-slot="user-audio-control"] {
+  height: 2.25rem;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in oklab, var(--foreground) 85%, transparent);
+  border-radius: 9999px;
+}
+
+[data-slot="user-audio-control"]:has(> [data-state="inactive"]) {
+  border-color: color-mix(
+    in oklab,
+    var(--inactive-background) 70%,
+    transparent
+  );
+}
+
+[data-slot="user-audio-control"] > * {
+  height: 100%;
+}
+
+[data-slot="user-audio-control"] > :first-child {
+  min-width: 0;
+  gap: 0.5rem;
+  padding-inline: 0.875rem 0.625rem;
+}
+
+[data-slot="user-audio-control"] > * + * {
+  position: relative;
+  width: 2.375rem;
+}
+
+[data-slot="user-audio-control"] > * + *::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem;
+  left: 0;
+  width: 1px;
+  background: color-mix(in oklab, var(--foreground) 25%, transparent);
+}
+
+/* Menus and popovers: a lighter panel with rounded corners, a hairline edge
+   and roomy rows. --muted is the volume slider's track. */
+[data-slot="dropdown-menu-content"],
+[data-slot="popover-content"] {
+  --radius: 0.875rem;
+  --popover: #1e1e1e;
+  --muted: rgb(255 255 255 / 0.14);
+  --accent: rgb(255 255 255 / 0.06);
+  --border: rgb(255 255 255 / 0.08);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.08),
+    0 18px 40px -12px rgb(0 0 0 / 0.7);
+}
+
+[data-slot="dropdown-menu-content"] {
+  /* Wide enough for most device names; longer ones are cut, below. */
+  width: min(20rem, calc(100vw - 1rem));
+  padding: 0.375rem;
+}
+
+[data-slot="popover-content"] {
+  padding: 0.75rem;
+}
+
+[data-slot="dropdown-menu-label"] {
+  padding: 0.5rem 0.75rem 0.25rem;
+}
+
+[data-slot="dropdown-menu-item"],
+[data-slot="dropdown-menu-checkbox-item"] {
+  padding-block: 0.5rem;
+  padding-left: 0.75rem;
+}
+
+[data-slot="dropdown-menu-item"] {
+  padding-right: 0.75rem;
+}
+
+/* One line per device, cut with an ellipsis, the check in the live green. */
+[data-slot="dropdown-menu-checkbox-item"] {
+  display: block;
+  overflow: hidden;
+  padding-right: 2.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-slot="dropdown-menu-checkbox-item-indicator"] {
+  inset-block: 0;
+  right: 0.75rem;
+  color: var(--active-background);
+}
+
+[data-slot="dropdown-menu-separator"] {
+  margin: 0.375rem -0.375rem;
+}

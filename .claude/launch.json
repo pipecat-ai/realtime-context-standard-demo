@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bot",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["--directory", "server", "run", "bot.py"],
+      "port": 7860
+    },
+    {
+      "name": "bot-trace",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["--directory", "server", "run", "bot.py", "-v"],
+      "port": 7860
+    },
+    {
+      "name": "client",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "client", "dev", "--port", "5173", "--strictPort"],
+      "port": 5173
+    }
+  ]
+}

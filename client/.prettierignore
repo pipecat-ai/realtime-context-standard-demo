@@ -1,0 +1,13 @@
+dist
+node_modules
+pnpm-lock.yaml
+vendor
+src/assets
+
+# Vendored from the shadcn and Pipecat UI registries; see eslint.config.js.
+src/components/ui
+src/components/pipecat
+src/hooks/use-pipecat-*.ts
+src/lib/transports.ts
+src/lib/visualizer.ts
+src/lib/utils.ts

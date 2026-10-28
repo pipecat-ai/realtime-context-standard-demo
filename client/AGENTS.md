@@ -4,18 +4,23 @@ These are the mandatory standards for all frontend code in `client/`. Follow the
 
 ## Stack
 
-| Concern         | Choice                                                                  |
-| --------------- | ----------------------------------------------------------------------- |
-| Build           | Vite (latest) + `@vitejs/plugin-react`                                  |
-| UI              | React 19, TypeScript (strict)                                           |
-| Components      | shadcn/ui (`base-nova` style, Base UI primitives) + Pipecat UI registry |
-| Styling         | Tailwind CSS 4 via `@tailwindcss/vite`                                  |
+| Concern          | Choice                                                                   |
+| ---------------- | ------------------------------------------------------------------------ |
+| Build            | Vite (latest) + `@vitejs/plugin-react`                                   |
+| UI               | React 19, TypeScript (strict)                                            |
+| Components       | shadcn/ui (`base-nova` style, Base UI primitives) + Pipecat UI registry  |
+| Styling          | Tailwind CSS 4 via `@tailwindcss/vite`                                   |
 | Voice / realtime | `@pipecat-ai/client-js`, `@pipecat-ai/client-react`, a Pipecat transport |
-| State           | Zustand                                                                 |
-| Lint / format   | ESLint (flat config) + Prettier (`prettier-plugin-tailwindcss`)         |
-| Runtime         | Node.js 22+                                                             |
+| State            | Zustand                                                                  |
+| Animation        | Motion (`motion/react`)                                                  |
+| Lint / format    | ESLint (flat config) + Prettier (`prettier-plugin-tailwindcss`)          |
+| Git hooks        | Husky                                                                    |
+| Package manager  | pnpm                                                                     |
+| Runtime          | Node.js 22+                                                              |
 
-Always install the latest stable releases. Use the package manager the lockfile indicates, and never mix managers or commit a second lockfile. Ask before adding a dependency that isn't listed here, and prefer what's already installed.
+Use pnpm for everything (`pnpm add`, `pnpm dlx`, `pnpm <script>`), never npm or yarn, and commit only `pnpm-lock.yaml`. Always install the latest stable releases, with one exception: the Pipecat client packages track unreleased `main` until the standard they implement ships, so don't swap them for published versions. `@pipecat-ai/client-js` and `client-react` install from the tarballs in `vendor/`, built by `scripts/vendor-pipecat.sh <commit>`. Adding a Pipecat registry item with the shadcn CLI rewrites them to the published versions: point them back at `vendor/` afterwards. Ask before adding a dependency that isn't listed here, and prefer what's already installed.
+
+Husky runs `lint`, `typecheck` and a Prettier check before every commit. Don't bypass it with `--no-verify`; fix what it reports.
 
 ## Project structure
 
@@ -50,9 +55,9 @@ client/
 - **Reach for existing components first.** Before writing UI, check `components/ui` and `components/pipecat`, then the shadcn and [Pipecat UI](https://ui.pipecat.ai/) registries. Hand-rolling a button, dialog, select, or similar element is not allowed.
 - **Add components with the CLI. Never copy them in by hand:**
   ```bash
-  npx shadcn@latest add button dialog
-  npx shadcn@latest registry add @pipecat          # once per project
-  npx shadcn@latest add @pipecat/connect-button @pipecat/conversation
+  pnpm dlx shadcn@latest add button dialog
+  pnpm dlx shadcn@latest registry add @pipecat          # once per project
+  pnpm dlx shadcn@latest add @pipecat/connect-button @pipecat/conversation
   ```
 - **Keep the `base-nova` style.** Pipecat UI is built and tested against it, and switching styles later doesn't regenerate primitives that are already installed.
 - **Treat generated primitives as vendored code.** Customize `components/ui/*` and `components/pipecat/*` through composition, props, and `className` first. Edit their source only when composition can't do the job. Keep those edits minimal and add a short comment saying why.
@@ -110,7 +115,7 @@ client/
   - Use `import type` for type-only imports.
 - **Configure ESLint as a flat config** with `typescript-eslint` (type-checked rules), `eslint-plugin-react-hooks` (recommended, including compiler rules), and `eslint-plugin-react-refresh`. Lint warnings are errors.
 - **Format with Prettier and `prettier-plugin-tailwindcss`,** and don't hand-format code.
-- **Provide these scripts in `package.json`:** `dev`, `build` (`tsc -b && vite build`), `preview`, `lint`, `typecheck`, and `format`.
+- **Provide these scripts in `package.json`:** `dev`, `build` (`tsc -b && vite build`), `preview`, `lint`, `typecheck`, `format`, and `prepare` (installs the Husky hooks).
 
 ## Responsive layout
 
@@ -134,7 +139,7 @@ client/
 
 - Leave no `console.log`, no commented-out code, and no unused exports, files, or dependencies.
 - Match the surrounding code's style and patterns, and don't refactor unrelated code in the same change.
-- Comments explain *why*, not *what*. Keep them rare and useful.
+- Comments explain _why_, not _what_. Keep them rare and useful.
 - Put copy and constants in clear named constants, never magic strings or numbers buried in JSX.
 - Delete scaffold leftovers such as the Vite logos and the demo counter.
 

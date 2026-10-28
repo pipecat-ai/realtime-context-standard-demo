@@ -6,7 +6,7 @@ shipping address or speed, cancels orders that haven't shipped, and hangs up whe
 customer is done.
 
 - `server/`: the bot.
-- `client/`: the web client (to come).
+- `client/`: the web client.
 
 ## Server
 
@@ -15,12 +15,14 @@ Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
     → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS)
 ```
 
-- **Tone reader** reads each user turn, with the bot's line before it, for emotion and
-  sarcasm. The LLM gets the reading with the user's message.
+- **Tone reader** reads each user turn on its own words, for emotion and sarcasm. The
+  bot's line before it can make sarcasm read sincere, so it's left out. The LLM gets
+  the reading with the user's message.
 - **Tone tagger** voices each sentence the LLM writes with the TTS's tags, breaths
   included.
 - **Tools** (`server/tools.py`) run against an in-memory order store seeded with three
-  orders: `51077` (processing), `48213` (shipped) and `39560` (delivered).
+  orders: `51077` (processing), `48213` (shipped) and `39560` (delivered). Any name
+  that isn't one of theirs gets `51077`, so a demo always has an order to work with.
 
 ### Start options
 
@@ -38,20 +40,24 @@ Set at session start, in the `/start` request's `body`:
 The Tone reader runs either way.
 
 Pipecat Tone's rc1 models come from
-[pipecat-ai/pipecat#6407](https://github.com/pipecat-ai/pipecat/pull/6407), so
-`server/pyproject.toml` installs Pipecat from that branch until it's released.
+[pipecat-ai/pipecat#6407](https://github.com/pipecat-ai/pipecat/pull/6407), and
+[pipecat-ai/pipecat#6418](https://github.com/pipecat-ai/pipecat/pull/6418), stacked on
+it, sends the reader's perception to the client in RTVI `user-input`. So
+`server/pyproject.toml` installs Pipecat from the #6418 branch until both are released.
 
 ### Run locally
 
 ```sh
-cp env.example .env   # fill in the keys below
 cd server
+cp env.example .env   # fill in the keys below
 uv sync
 uv run bot.py
 ```
 
 Open http://localhost:7860/client. The first session downloads the Tone models from
 Hugging Face before the pipeline starts.
+
+Server env, in `server/.env` (from `server/env.example`):
 
 | Variable                | For                                                    |
 | ----------------------- | ------------------------------------------------------ |
@@ -60,7 +66,67 @@ Hugging Face before the pipeline starts.
 | `PHONELLM_MINI_API_KEY` | `use_tagger` true: Baseten API key                     |
 | `OPENAI_API_KEY`        | `use_tagger` false: GPT-5.6 Luna                       |
 | `ELEVENLABS_API_KEY`    | `tts` elevenlabs                                       |
-| `ELEVENLABS_VOICE_ID`   | `tts` elevenlabs: the voice                            |
+| `ELEVENLABS_VOICE_ID`   | `tts` elevenlabs, optional: defaults to River          |
 | `CARTESIA_API_KEY`      | `tts` cartesia                                         |
 | `CARTESIA_VOICE_ID`     | `tts` cartesia, optional: defaults to an Emotive voice |
 | `HF_TOKEN`              | Optional: Hugging Face downloads                       |
+
+### Evals
+
+`server/evals/` holds [Pipecat evals](https://docs.pipecat.ai/pipecat/evals/overview):
+scripted conversations in `scenarios/support_call.yaml` (look up a shipped order and
+decline changing it, confirm before cancelling, hang up on goodbye), run against both
+`use_tagger` paths by `manifest.yaml`. They run in text mode, so they test the LLM's
+tool calls and policy, not speech, and an OpenAI model (`OPENAI_API_KEY`) judges them.
+
+```sh
+cd server
+uv run pipecat eval suite evals/manifest.yaml
+```
+
+The suite starts a fresh bot for each run, and writes logs and `results.jsonl` to
+`server/evals/eval-runs/`.
+
+### Deploy to Pipecat Cloud
+
+Deploys to the `daily-demos` organization as `realtime-context-standard-demo` on an
+`agent-2x` profile with Krisp VIVA on, built in the cloud from `server/Dockerfile`.
+It needs Pipecat and the clients published first: the image can't install Pipecat from
+a git branch.
+
+```sh
+cd server
+cp pcc-deploy.example.toml pcc-deploy.toml
+pipecat cloud secrets set realtime-context-standard-demo-secrets --file .env --organization daily-demos
+pipecat cloud deploy --organization daily-demos
+pipecat cloud organizations keys create --organization daily-demos   # pk_... for the client
+```
+
+## Client
+
+Vite + React, built on the unreleased RTVI 2.3.0 Pipecat clients (vendored in
+`client/vendor/` by `client/scripts/vendor-pipecat.sh`). The stage shows the bot's
+voice on the ambient background; the side panel shows the transcript, tool calls
+and latency. Under each user line are the Tone reader's emotion and sarcasm; under
+each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and
+the sounds and pauses performed.
+
+```sh
+cd client
+cp env.example .env.local   # BOT_START_URL defaults to the local runner
+pnpm install
+pnpm dev
+```
+
+The browser only calls `/api/start` (`client/server/bot-api.ts`, served by Vite in
+dev and by the Vercel functions in `client/api/` in production), which holds the
+Pipecat Cloud key and forwards only the `tts` and `use_tagger` options.
+
+Client env, in `client/.env.local` (from `client/env.example`), or the Vercel
+project's environment in production:
+
+| Variable                   | For                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `VITE_BOT_TRANSPORT`       | `webrtc` (default) or `daily`; read by the browser and `/api/start`             |
+| `BOT_START_URL`            | The local runner (default) or `https://api.pipecat.daily.co/v1/public/realtime-context-standard-demo/start` |
+| `BOT_START_PUBLIC_API_KEY` | With Pipecat Cloud: the `pk_...` key. Server only, never `VITE_`-prefixed        |

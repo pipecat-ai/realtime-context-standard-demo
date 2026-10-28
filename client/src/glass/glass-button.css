@@ -1,0 +1,189 @@
+/* GlassButton's light that follows the pointer: a glare under it and a hot
+   rim on the nearest edge. The glass itself is drawn by AmbientBackground.
+
+   .glass-track is an invisible 12x5 grid of hover cells; :has() reads the
+   hovered cell into --glass-x / --glass-y (0-1), and @property lets them
+   glide between cells, with no script. */
+
+@property --glass-x {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.5;
+}
+
+@property --glass-y {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.2;
+}
+
+/* 0 at rest, 1 hovered. */
+@property --glass-hover {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@layer components {
+  .glass-button {
+    --glass-at: calc(var(--glass-x) * 100%) calc(var(--glass-y) * 100%);
+
+    position: relative;
+    isolation: isolate;
+    /* A pill by default; the glass follows any radius. */
+    border-radius: 999px;
+    /* Painted outside the border box only, so the glass stays untouched. */
+    box-shadow: 0 12px 40px -16px oklch(0 0 0 / 0.08);
+    /* Leaving, the light fades in place rather than gliding home. */
+    transition:
+      --glass-x 0s 1e6s,
+      --glass-y 0s 1e6s,
+      --glass-hover 450ms ease,
+      scale 160ms ease,
+      opacity 160ms ease;
+  }
+
+  /* Without WebGL2 there's no glass: a plain frosted fill. */
+  .glass-button[data-glass="flat"] {
+    background: oklch(1 0 0 / 0.1);
+    box-shadow:
+      inset 0 0 0 1px oklch(1 0 0 / 0.35),
+      0 12px 40px -16px oklch(0 0 0 / 0.08);
+  }
+
+  .glass-button:not(:disabled):hover {
+    --glass-hover: 1;
+    transition:
+      --glass-x 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      --glass-y 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      --glass-hover 450ms ease,
+      scale 160ms ease,
+      opacity 160ms ease;
+  }
+
+  .glass-button:not(:disabled):active {
+    scale: 0.97;
+  }
+
+  .glass-button > .glass-layer {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .glass-button > .glass-glare {
+    background: radial-gradient(
+      circle 160px at var(--glass-at),
+      oklch(1 0 0 / 0.12),
+      oklch(1 0 0 / 0.04) 40%,
+      transparent 72%
+    );
+    mix-blend-mode: plus-lighter;
+    opacity: calc(var(--glass-hover) * 0.8);
+    transition: filter 160ms ease;
+  }
+
+  .glass-button:not(:disabled):active > .glass-glare {
+    filter: brightness(1.4);
+  }
+
+  /* A gradient on the border box, masked down to a ring. */
+  .glass-button > .glass-rim {
+    padding: 1.5px;
+    background: radial-gradient(
+      circle 100px at var(--glass-at),
+      oklch(1 0 0 / 0.85),
+      oklch(1 0 0 / 0.6) 12%,
+      oklch(1 0 0 / 0.3) 32%,
+      oklch(1 0 0 / 0.12) 58%,
+      transparent 82%
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: calc(var(--glass-hover) * 0.75);
+  }
+
+  /* Over everything, so the pointer is always over one cell; clicks pass to
+     the button. */
+  .glass-button > .glass-track {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    border-radius: inherit;
+    overflow: hidden;
+  }
+
+  .glass-button > .glass-track > * {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .glass-button > .glass-track > * > * {
+    flex: 1;
+  }
+
+  .glass-button:has(> .glass-track > :nth-child(1):hover) {
+    --glass-x: 0.0417;
+  }
+  .glass-button:has(> .glass-track > :nth-child(2):hover) {
+    --glass-x: 0.125;
+  }
+  .glass-button:has(> .glass-track > :nth-child(3):hover) {
+    --glass-x: 0.2083;
+  }
+  .glass-button:has(> .glass-track > :nth-child(4):hover) {
+    --glass-x: 0.2917;
+  }
+  .glass-button:has(> .glass-track > :nth-child(5):hover) {
+    --glass-x: 0.375;
+  }
+  .glass-button:has(> .glass-track > :nth-child(6):hover) {
+    --glass-x: 0.4583;
+  }
+  .glass-button:has(> .glass-track > :nth-child(7):hover) {
+    --glass-x: 0.5417;
+  }
+  .glass-button:has(> .glass-track > :nth-child(8):hover) {
+    --glass-x: 0.625;
+  }
+  .glass-button:has(> .glass-track > :nth-child(9):hover) {
+    --glass-x: 0.7083;
+  }
+  .glass-button:has(> .glass-track > :nth-child(10):hover) {
+    --glass-x: 0.7917;
+  }
+  .glass-button:has(> .glass-track > :nth-child(11):hover) {
+    --glass-x: 0.875;
+  }
+  .glass-button:has(> .glass-track > :nth-child(12):hover) {
+    --glass-x: 0.9583;
+  }
+  .glass-button:has(> .glass-track > * > :nth-child(1):hover) {
+    --glass-y: 0.1;
+  }
+  .glass-button:has(> .glass-track > * > :nth-child(2):hover) {
+    --glass-y: 0.3;
+  }
+  .glass-button:has(> .glass-track > * > :nth-child(3):hover) {
+    --glass-y: 0.5;
+  }
+  .glass-button:has(> .glass-track > * > :nth-child(4):hover) {
+    --glass-y: 0.7;
+  }
+  .glass-button:has(> .glass-track > * > :nth-child(5):hover) {
+    --glass-y: 0.9;
+  }
+
+  /* Touch has no hover to follow. */
+  @media (hover: none) {
+    .glass-button > .glass-track,
+    .glass-button > .glass-layer {
+      display: none;
+    }
+  }
+}

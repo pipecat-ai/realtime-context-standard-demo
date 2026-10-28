@@ -1,0 +1,121 @@
+/* Meters, labels and readings, drawn in this app's tokens and mono face:
+   muted is an unlit segment, border a baseline, faint what can be missed;
+   history fades to --opacity-trail. Used by components/meters.tsx and
+   components/readings.tsx. */
+:root {
+  --opacity-trail: 0.55;
+}
+
+.readout-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.readout-axis {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-seg {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.readout-seg > i {
+  display: block;
+  background: var(--muted);
+  transition: background-color 60ms steps(1);
+}
+@keyframes readout-pop {
+  50% {
+    transform: scale(1.7) translateY(var(--pop-y, -3px));
+  }
+}
+.readout-seg > i.readout-pop {
+  animation: readout-pop 280ms ease-out both;
+}
+
+.readout-minibars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  vertical-align: middle;
+}
+.readout-minibars > i {
+  display: block;
+  width: 3px;
+}
+
+.readout-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.readout-stat-val {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.readout-stat-val small {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+.readout-stat-val > :not(small) {
+  align-self: center;
+}
+
+.readout-section-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding-bottom: 6px;
+}
+
+/* Labelled readings under a line: a tracked key, then the value in its
+   colour and an optional muted detail. */
+.readout-readings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.readout-reading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.readout-reading > b {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.readout-reading > small {
+  font-size: inherit;
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .readout-seg > i.readout-pop {
+    animation: none;
+  }
+}

@@ -1,0 +1,3 @@
+# Hooks run from the git root; the client and its tools live in client/.
+cd client
+pnpm check
