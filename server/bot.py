@@ -139,65 +139,21 @@ def build_system_instruction() -> str:
     )
 
 
-def build_expression_policy(options: BotOptions) -> ExpressionPolicy:
-    """The expression policy for the session's TTS and tag writer.
+def build_expression_policy(tts: TTSName) -> ExpressionPolicy:
+    """The expression policy, the same with or without the tagger.
 
     With the tagger, the presets steer it and the LLM gets only the reading
     guidance. Without it, the pipeline composes the tags the TTS performs, and
-    this policy, into the LLM's system instruction as a prompt fragment.
+    this policy, into the LLM's system instruction.
     """
     guidance: list[ExpressionGuidance | str] = [
         ExpressionGuidance.MATCH_STYLE,
         ExpressionGuidance.SLOW_FOR_DETAILS,
     ]
     # Cartesia performs no breath.
-    if options.tts == "elevenlabs":
+    if tts == "elevenlabs":
         guidance.append(ExpressionGuidance.BREATHE)
-    guidance += READING_GUIDANCE
-
-    if options.use_tagger:
-        return ExpressionPolicy(guidance=guidance)
-
-    # Offered many names, an LLM starts inventing its own, so it's offered only
-    # the ones a support call needs.
-    if options.tts == "cartesia":
-        return ExpressionPolicy(
-            guidance=[
-                *guidance,
-                "Some feelings have no delivery of their own: to reassure, use calm or "
-                "sympathetic; for relief, use happy or content.",
-            ],
-            delivery=[
-                "slow",
-                "calm",
-                "content",
-                "sympathetic",
-                "apologetic",
-                "grateful",
-                "happy",
-                "excited",
-                "curious",
-                "confident",
-                "surprised",
-                "hesitant",
-            ],
-        )
-    return ExpressionPolicy(
-        guidance=guidance,
-        delivery=[
-            "slow",
-            "warmly",
-            "happy",
-            "excited",
-            "curious",
-            "thoughtful",
-            "sympathetic",
-            "reassuring",
-            "apologetic",
-            "professional",
-        ],
-        sounds=["chuckles", "laughs", "sighs", "exhales", "short breath", "clears throat"],
-    )
+    return ExpressionPolicy(guidance=[*guidance, *READING_GUIDANCE])
 
 
 def build_llm(options: BotOptions) -> LLMService[Any]:
@@ -291,7 +247,7 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
             enable_metrics=True,
             enable_usage_metrics=True,
             enable_expressive_conversation=True,
-            expression_policy=build_expression_policy(options),
+            expression_policy=build_expression_policy(options.tts),
         ),
         idle_timeout_secs=runner_args.pipeline_idle_timeout_secs,
         # Shared with the tool handlers as params.app_resources
