@@ -15,9 +15,8 @@ Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
     → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS)
 ```
 
-- **Tone reader** reads each user turn on its own words, for emotion and sarcasm. The
-  bot's line before it can make sarcasm read sincere, so it's left out. The LLM gets
-  the reading with the user's message.
+- **Tone reader** reads each user turn, with the bot's line before it, for emotion and
+  sarcasm. The LLM gets the reading with the user's message.
 - **Tone tagger** voices each sentence the LLM writes with the TTS's tags, breaths
   included.
 - **Tools** (`server/tools.py`) run against an in-memory order store seeded with three
@@ -41,9 +40,9 @@ The Tone reader runs either way.
 
 Pipecat Tone's rc1 models come from
 [pipecat-ai/pipecat#6407](https://github.com/pipecat-ai/pipecat/pull/6407), and
-[pipecat-ai/pipecat#6418](https://github.com/pipecat-ai/pipecat/pull/6418), stacked on
-it, sends the reader's perception to the client in RTVI `user-input`. So
-`server/pyproject.toml` installs Pipecat from the #6418 branch until both are released.
+[pipecat-ai/pipecat#6418](https://github.com/pipecat-ai/pipecat/pull/6418) sends the
+reader's perception to the client in RTVI `user-input`. Both are merged but not yet
+released, so `server/pyproject.toml` installs Pipecat from `main` until they are.
 
 ### Run locally
 

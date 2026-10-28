@@ -224,10 +224,10 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     # pipeline needs no VAD or turn analyzer.
     stt = DeepgramFluxSTTService(api_key=os.environ["DEEPGRAM_API_KEY"])
 
-    # Reads each final transcription for the user's emotion and sarcasm, on its
-    # own words: the bot's line before it can make sarcasm read sincere. The
-    # LLM gets the reading at the head of the user's message.
-    tone_reader = PipecatToneReader(read_previous=False)
+    # Reads each final transcription for the user's emotion and sarcasm, with
+    # the bot's line before it. The LLM gets the reading at the head of the
+    # user's message.
+    tone_reader = PipecatToneReader()
 
     llm = build_llm(options)
     tts = build_tts(options)

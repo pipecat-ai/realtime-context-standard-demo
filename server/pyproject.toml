@@ -11,11 +11,11 @@ dependencies = [
 [dependency-groups]
 dev = ["pipecat-ai[cli]", "pyright>=1.1.404,<2", "ruff>=0.12.11,<1"]
 
-# Pipecat Tone's rc1 models land in pipecat-ai/pipecat#6407. Stacked on it, #6418
-# puts the reader's perception on RTVI user-input, and #6419 adds the reader's
-# read_previous. Drop this source and pin a release once all three ship.
+# Pipecat Tone's rc1 models (pipecat-ai/pipecat#6407) and the reader's perception on
+# RTVI user-input (#6418) are on main but not yet released. Drop this source and pin
+# a release once they ship.
 [tool.uv.sources]
-pipecat-ai = { git = "https://github.com/pipecat-ai/pipecat.git", branch = "jpt/tone-reader-optional-previous" }
+pipecat-ai = { git = "https://github.com/pipecat-ai/pipecat.git", branch = "main" }
 
 [tool.ruff]
 line-length = 100
