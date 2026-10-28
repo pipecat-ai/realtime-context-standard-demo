@@ -31,10 +31,11 @@ Set at session start, in the `/start` request's `body`:
 { "transport": "webrtc", "body": { "tts": "cartesia", "use_tagger": "false" } }
 ```
 
-| Option       | Values                                | Effect                                                                                                                     |
-| ------------ | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `tts`        | `"elevenlabs"` (default), `"cartesia"` | ElevenLabs v4 Text-to-Dialogue, or Cartesia. Breaths only with ElevenLabs.                                                  |
-| `use_tagger` | `"true"` (default), `"false"`          | `"false"` drops the tagger and swaps PhoneLLM Mini for GPT-5.6 Luna, which writes the tags itself from the TTS's tag spec. |
+| Option                | Values                                | Effect                                                                                                                     |
+| --------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `tts`                 | `"elevenlabs"` (default), `"cartesia"` | ElevenLabs v4 Text-to-Dialogue, or Cartesia. Breaths only with ElevenLabs.                                                  |
+| `use_tagger`          | `"true"` (default), `"false"`          | `"false"` drops the tagger and swaps PhoneLLM Mini for GPT-5.6 Luna, which writes the tags itself from the TTS's tag spec. |
+| `detect_backchannels` | `"false"` (default), `"true"`          | `"true"` keeps Sam talking through the user's backchannels ("mm-hmm"), which the transcript shows in grey. See `server/backchannel/`. |
 
 The Tone reader runs either way.
 
@@ -68,7 +69,7 @@ Server env, in `server/.env` (from `server/env.example`):
 | `ELEVENLABS_VOICE_ID`   | `tts` elevenlabs, optional: defaults to River          |
 | `CARTESIA_API_KEY`      | `tts` cartesia                                         |
 | `CARTESIA_VOICE_ID`     | `tts` cartesia, optional: defaults to an Emotive voice |
-| `HF_TOKEN`              | Optional: Hugging Face downloads                       |
+| `HF_TOKEN`              | Optional: Hugging Face downloads. `detect_backchannels` true: read access to `pipecat-ai`, whose model is private for now, unless `hf auth login` has it |
 
 ### Evals
 
@@ -108,7 +109,9 @@ Vite + React, built on the unreleased RTVI 2.3.0 Pipecat clients (vendored in
 voice on the ambient background; the side panel shows the transcript, tool calls
 and latency. Under each user line are the Tone reader's emotion and sarcasm; under
 each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and
-the sounds and pauses performed.
+the sounds and pauses performed. With the backchannel detector on, what the user
+said while Sam talked through it shows in a grey, dashed bubble labelled
+"backchannel".
 
 ```sh
 cd client
@@ -119,7 +122,8 @@ pnpm dev
 
 The browser only calls `/api/start` (`client/server/bot-api.ts`, served by Vite in
 dev and by the Vercel functions in `client/api/` in production), which holds the
-Pipecat Cloud key and forwards only the `tts` and `use_tagger` options.
+Pipecat Cloud key and forwards only the `tts`, `use_tagger` and `detect_backchannels`
+options.
 
 Client env, in `client/.env.local` (from `client/env.example`), or the Vercel
 project's environment in production:

@@ -26,6 +26,7 @@ export interface BotApiConfig {
 const SESSION_OPTIONS = {
   tts: ["elevenlabs", "cartesia"],
   use_tagger: ["true", "false"],
+  detect_backchannels: ["true", "false"],
 } as const
 
 const DEFAULT_START_URL = "http://localhost:7860/start"

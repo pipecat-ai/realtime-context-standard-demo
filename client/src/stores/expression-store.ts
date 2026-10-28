@@ -58,8 +58,9 @@ export const useExpressionStore = create<ExpressionState>()((set) => ({
   perception: {},
   segments: {},
   moods: [],
-  userInput: ({ text, final, perception }) => {
-    if (!final) return
+  userInput: ({ text, final, input_type, perception }) => {
+    // A backchannel was heard, but never as a transcript of a turn.
+    if (!final || input_type === "backchannel") return
     const line = text.trim()
     set((state) => ({
       heard: new Set(state.heard).add(line),

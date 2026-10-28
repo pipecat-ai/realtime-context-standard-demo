@@ -12,7 +12,8 @@ const BOT_TRANSPORT =
  */
 export function sessionOptions(
   tts: TtsChoice,
-  useTagger: boolean
+  useTagger: boolean,
+  detectBackchannels: boolean
 ): UsePipecatAppOptions {
   return {
     transportType: BOT_TRANSPORT,
@@ -26,7 +27,11 @@ export function sessionOptions(
           ).SmallWebRTCTransport(options),
     startBotParams: {
       endpoint: "/api/start",
-      requestData: { tts, use_tagger: String(useTagger) },
+      requestData: {
+        tts,
+        use_tagger: String(useTagger),
+        detect_backchannels: String(detectBackchannels),
+      },
     },
     initDevicesOnMount: true,
   }

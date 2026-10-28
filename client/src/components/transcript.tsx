@@ -18,6 +18,7 @@ const EMPTY = "nothing said yet. start a call and ask about an order_"
 const BOT_NAME = "sam"
 /** The header switch: shows or hides the reader and tagger rows under the bubbles. */
 const TONE_LABEL = "show tone"
+const BACKCHANNEL_LABEL = "backchannel"
 
 /*
  * PARTS_IN_ORDER: a message's parts are keyed by position. The conversation
@@ -44,18 +45,24 @@ function Bubble({
   children: ReactNode
 }) {
   const user = message.role === "user"
+  const backchannel = message.backchannel === true
   return (
     <div className={cn("flex max-w-5/6 flex-col gap-1", user && "items-end")}>
       <p className="readout-label px-1">
         <span className={user ? "text-client" : "text-agent"}>
           {user ? "you" : BOT_NAME}
         </span>
+        {backchannel && ` · ${BACKCHANNEL_LABEL}`}
         {` · ${shortTime(message.createdAt)}`}
       </p>
       <div
         className={cn(
           "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-          user ? "rounded-br-md bg-client/15" : "rounded-bl-md bg-secondary"
+          backchannel
+            ? "rounded-br-md border border-dashed border-faint text-muted-foreground italic"
+            : user
+              ? "rounded-br-md bg-client/15"
+              : "rounded-bl-md bg-secondary"
         )}
       >
         {children}
@@ -103,6 +110,16 @@ function UserTurn({
   )
 }
 
+/**
+ * An acknowledgment the user said while the bot talked, such as "mm-hmm",
+ * which the bot talked through and the LLM never read.
+ */
+function Backchannel({ message }: { message: ConversationMessage }) {
+  return (
+    <Bubble message={message}>{message.parts.map(partText).join(" ")}</Bubble>
+  )
+}
+
 /** What the bot said, spoken words lit, and under the bubble the line as voiced. */
 function BotTurn({
   message,
@@ -141,7 +158,10 @@ function BotTurn({
 }
 
 export function Transcript({ className }: { className?: string }) {
-  const { messages } = usePipecatConversation({ includeExpressionEvents: true })
+  const { messages } = usePipecatConversation({
+    includeExpressionEvents: true,
+    includeBackchannel: true,
+  })
   const heard = useExpressionStore((state) => state.heard)
   const [showData, setShowData] = useState(true)
   const [userSpeaking, setUserSpeaking] = useState(false)
@@ -155,7 +175,7 @@ export function Transcript({ className }: { className?: string }) {
   // user next speaks, as if the bot heard it, so a user line shows only
   // while it's being spoken, or once the bot's final transcript of it comes.
   const turns = messages.flatMap((message) => {
-    if (message.role === "assistant") return [message]
+    if (message.role === "assistant" || message.backchannel) return [message]
     if (message.role !== "user") return []
     const parts = message.parts.filter(
       (part) =>
@@ -193,7 +213,9 @@ export function Transcript({ className }: { className?: string }) {
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
-                {message.role === "user" ? (
+                {message.backchannel ? (
+                  <Backchannel message={message} />
+                ) : message.role === "user" ? (
                   <UserTurn message={message} showData={showData} />
                 ) : (
                   <BotTurn message={message} showData={showData} />

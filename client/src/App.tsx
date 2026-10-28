@@ -44,11 +44,15 @@ function Session(props: SessionProps) {
 }
 
 export function App() {
-  const { tts, useTagger } = useSessionStore(
-    useShallow(({ tts, useTagger }) => ({ tts, useTagger }))
+  const { tts, useTagger, detectBackchannels } = useSessionStore(
+    useShallow(({ tts, useTagger, detectBackchannels }) => ({
+      tts,
+      useTagger,
+      detectBackchannels,
+    }))
   )
   const { client, connect, disconnect, error } = usePipecatApp(
-    sessionOptions(tts, useTagger)
+    sessionOptions(tts, useTagger, detectBackchannels)
   )
 
   if (!client) {

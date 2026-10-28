@@ -1,3 +1,4 @@
+import { Toggle } from "@/components/ui/toggle"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useSessionStore, type TtsChoice } from "@/stores/session-store"
 
@@ -8,6 +9,9 @@ const TTS_LABELS: Record<TtsChoice, string> = {
 
 /** Who writes the expression tags: the Tone tagger or the LLM. */
 const TAGGER_LABELS = { tagger: "PhoneLLM + tagger", llm: "Luna writes tags" }
+
+/** Lit, the backchannel model keeps Sam talking through "mm-hmm". */
+const BACKCHANNELS_LABEL = "Backchannel detector"
 
 /** The kit's pressed fill barely lifts off the page; the chosen option is lit. */
 const ITEM = "aria-pressed:bg-primary aria-pressed:text-primary-foreground"
@@ -21,6 +25,12 @@ export function SessionOptions() {
   const useTagger = useSessionStore((state) => state.useTagger)
   const setTts = useSessionStore((state) => state.setTts)
   const setUseTagger = useSessionStore((state) => state.setUseTagger)
+  const detectBackchannels = useSessionStore(
+    (state) => state.detectBackchannels
+  )
+  const setDetectBackchannels = useSessionStore(
+    (state) => state.setDetectBackchannels
+  )
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -54,6 +64,15 @@ export function SessionOptions() {
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
+      <Toggle
+        variant="outline"
+        size="sm"
+        pressed={detectBackchannels}
+        onPressedChange={setDetectBackchannels}
+        className={ITEM}
+      >
+        {BACKCHANNELS_LABEL}
+      </Toggle>
     </div>
   )
 }

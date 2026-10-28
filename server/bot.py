@@ -12,11 +12,13 @@ with Pipecat Tone reading the user and voicing the bot:
     Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
         → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS)
 
-Two start-time options, read from the ``/start`` request body, swap parts:
+Three start-time options, read from the ``/start`` request body, swap parts:
 
 - ``tts``: ``"elevenlabs"`` (default) or ``"cartesia"``.
 - ``use_tagger``: ``"true"`` (default) or ``"false"``, which drops the tagger
   and has GPT-5.6 Luna write the expression tags itself.
+- ``detect_backchannels``: ``"false"`` (default) or ``"true"``, which keeps Sam
+  talking through the user's backchannels (``backchannel/``).
 
 Run the bot using::
 
@@ -63,6 +65,7 @@ from pipecat.transports.daily.transport import DailyParams
 from pipecat.turns.user_mute import MuteUntilFirstBotCompleteUserMuteStrategy
 from pipecat.workers.runner import WorkerRunner
 
+from backchannel import BackchannelFluxSTTService
 from meter import MoodMeter
 from tools import TOOLS, OrderStore
 
@@ -115,6 +118,9 @@ class BotOptions:
     # True: PhoneLLM Mini writes plain words and the Tone tagger voices them.
     # False: GPT-5.6 Luna writes the tags itself.
     use_tagger: bool = True
+    # True: the backchannel model hears whether speech over Sam is a backchannel
+    # ("mm-hmm"), which leaves Sam talking, or an interruption.
+    detect_backchannels: bool = False
 
     @classmethod
     def from_body(cls, body: Any) -> "BotOptions":
@@ -125,7 +131,16 @@ class BotOptions:
         use_tagger = str(body.get("use_tagger", cls.use_tagger)).lower()
         if use_tagger not in ("true", "false"):
             raise ValueError(f"use_tagger must be 'true' or 'false', got {use_tagger!r}")
-        return cls(tts=tts, use_tagger=use_tagger == "true")
+        detect_backchannels = str(body.get("detect_backchannels", cls.detect_backchannels)).lower()
+        if detect_backchannels not in ("true", "false"):
+            raise ValueError(
+                f"detect_backchannels must be 'true' or 'false', got {detect_backchannels!r}"
+            )
+        return cls(
+            tts=tts,
+            use_tagger=use_tagger == "true",
+            detect_backchannels=detect_backchannels == "true",
+        )
 
 
 def ordinal(day: int) -> str:
@@ -221,8 +236,11 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     logger.info(f"Starting bot: {options}")
 
     # Flux transcribes and detects the end of each turn with one model, so the
-    # pipeline needs no VAD or turn analyzer.
-    stt = DeepgramFluxSTTService(api_key=os.environ["DEEPGRAM_API_KEY"])
+    # pipeline needs no VAD or turn analyzer. With detect_backchannels, the
+    # backchannel model holds each turn Flux starts over Sam until it hears
+    # whether it's a backchannel, which never becomes a turn.
+    flux = BackchannelFluxSTTService if options.detect_backchannels else DeepgramFluxSTTService
+    stt = flux(api_key=os.environ["DEEPGRAM_API_KEY"])
 
     # Reads each final transcription for the user's emotion and sarcasm, with
     # the bot's line before it. The LLM gets the reading at the head of the

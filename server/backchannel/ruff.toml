@@ -1,0 +1,5 @@
+extend = "../pyproject.toml"
+
+# Copied from pipecat-vap as they are, so they can be copied again (README.md).
+[lint.per-file-ignores]
+"decision.py" = ["UP042"]
