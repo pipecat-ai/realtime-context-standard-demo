@@ -23,6 +23,7 @@ Run the bot using::
     uv run bot.py
 """
 
+import importlib.util
 import os
 from dataclasses import dataclass
 from datetime import datetime
@@ -30,6 +31,7 @@ from typing import Any, Literal, get_args
 
 from dotenv import load_dotenv
 from loguru import logger
+from pipecat.evals.transport import EvalTransportParams
 from pipecat.expressive.perception import format_perception
 from pipecat.expressive.policy import ExpressionGuidance, ExpressionPolicy
 from pipecat.frames.frames import LLMRunFrame
@@ -38,8 +40,10 @@ from pipecat.pipeline.worker import PipelineParams, PipelineWorker
 from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.aggregators.llm_response_universal import (
     LLMContextAggregatorPair,
+    LLMUserAggregatorParams,
     UserTurnStoppedMessage,
 )
+from pipecat.processors.frameworks.rtvi import RTVIFunctionCallReportLevel, RTVIObserverParams
 from pipecat.processors.tone.reader import PipecatToneReader
 from pipecat.processors.tone.tagger import PipecatToneTagger
 from pipecat.runner.types import RunnerArguments
@@ -56,8 +60,10 @@ from pipecat.services.openai.responses.llm import (
 from pipecat.services.tts_service import TTSService
 from pipecat.transports.base_transport import BaseTransport, TransportParams
 from pipecat.transports.daily.transport import DailyParams
+from pipecat.turns.user_mute import MuteUntilFirstBotCompleteUserMuteStrategy
 from pipecat.workers.runner import WorkerRunner
 
+from meter import MoodMeter
 from tools import TOOLS, OrderStore
 
 load_dotenv(override=True)
@@ -188,19 +194,23 @@ def build_tts(options: BotOptions) -> TTSService:
     Both keep their default names: the tagger reads the name to tell which TTS
     it tags for.
     """
+    # `or`, not a getenv default, so a blank line copied from env.example falls
+    # back to the default voice too.
     if options.tts == "cartesia":
         return CartesiaTTSService(
             api_key=os.environ["CARTESIA_API_KEY"],
             settings=CartesiaTTSService.Settings(
                 # An "Emotive" voice, which Cartesia recommends for emotion.
-                voice=os.getenv("CARTESIA_VOICE_ID", "57dcab65-68ac-45a6-8480-6c4c52ec1cd1"),
+                voice=os.getenv("CARTESIA_VOICE_ID") or "57dcab65-68ac-45a6-8480-6c4c52ec1cd1",
             ),
         )
     return ElevenLabsDialogueTTSService(
         api_key=os.environ["ELEVENLABS_API_KEY"],
         settings=ElevenLabsDialogueTTSService.Settings(
             model="eleven_v4_turbo",
-            voice=os.environ["ELEVENLABS_VOICE_ID"],
+            # River, a premade voice every account has: gender-neutral like Sam,
+            # and one ElevenLabs labels conversational.
+            voice=os.getenv("ELEVENLABS_VOICE_ID") or "SAz9YHcvj6GT2YYXdXww",
         ),
     )
 
@@ -214,16 +224,23 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     # pipeline needs no VAD or turn analyzer.
     stt = DeepgramFluxSTTService(api_key=os.environ["DEEPGRAM_API_KEY"])
 
-    # Reads each final transcription, with the bot's line before it, for the
-    # user's emotion and sarcasm. The LLM gets the reading at the head of the
-    # user's message.
-    tone_reader = PipecatToneReader()
+    # Reads each final transcription for the user's emotion and sarcasm, on its
+    # own words: the bot's line before it can make sarcasm read sincere. The
+    # LLM gets the reading at the head of the user's message.
+    tone_reader = PipecatToneReader(read_previous=False)
 
     llm = build_llm(options)
     tts = build_tts(options)
 
     context = LLMContext(tools=TOOLS)
-    user_aggregator, assistant_aggregator = LLMContextAggregatorPair(context)
+    user_aggregator, assistant_aggregator = LLMContextAggregatorPair(
+        context,
+        # Sam's greeting plays out before the user is heard, so noise or echo
+        # as the call connects can't interrupt it or reach the LLM.
+        user_params=LLMUserAggregatorParams(
+            user_mute_strategies=[MuteUntilFirstBotCompleteUserMuteStrategy()],
+        ),
+    )
 
     pipeline = Pipeline(
         [
@@ -250,6 +267,11 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
             expression_policy=build_expression_policy(options.tts),
         ),
         idle_timeout_secs=runner_args.pipeline_idle_timeout_secs,
+        # The client lists each tool call with its arguments and result; the
+        # default level sends only the call's ID.
+        rtvi_observer_params=RTVIObserverParams(
+            function_call_report_level={"*": RTVIFunctionCallReportLevel.FULL},
+        ),
         # Shared with the tool handlers as params.app_resources
         app_resources=OrderStore(),
     )
@@ -268,10 +290,14 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
         )
         await worker.queue_frames([LLMRunFrame()])
 
+    # The caller's mood across the call, for the client's mood panel.
+    mood = MoodMeter()
+
     @user_aggregator.event_handler("on_user_turn_stopped")
     async def on_user_turn_stopped(aggregator, strategy, message: UserTurnStoppedMessage):
         if message.perception:
             logger.info(f"Tone: {format_perception(message.perception)}")
+            await worker.rtvi.send_server_message(mood.read(message.perception))
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):
@@ -285,11 +311,29 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     await runner.run()
 
 
+def krisp_filter():
+    """Krisp VIVA voice isolation on Pipecat Cloud, whose base image carries its SDK.
+
+    None locally, where the SDK isn't available.
+    """
+    if importlib.util.find_spec("krisp_audio") is None:
+        return None
+    from pipecat.audio.filters.krisp_viva_filter import KrispVivaFilter
+
+    return KrispVivaFilter()
+
+
 async def bot(runner_args: RunnerArguments):
     """Main bot entry point."""
     transport_params = {
-        "daily": lambda: DailyParams(audio_in_enabled=True, audio_out_enabled=True),
-        "webrtc": lambda: TransportParams(audio_in_enabled=True, audio_out_enabled=True),
+        "daily": lambda: DailyParams(
+            audio_in_enabled=True, audio_in_filter=krisp_filter(), audio_out_enabled=True
+        ),
+        "webrtc": lambda: TransportParams(
+            audio_in_enabled=True, audio_in_filter=krisp_filter(), audio_out_enabled=True
+        ),
+        # The `pipecat eval` harness, which connects to the dev runner's /ws route
+        "eval": lambda: EvalTransportParams(audio_in_enabled=True, audio_out_enabled=True),
     }
 
     transport = await create_transport(runner_args, transport_params)

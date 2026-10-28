@@ -1,0 +1,70 @@
+name: support_call
+
+# Text mode (the default): each user turn is sent as text, bypassing STT, and the
+# judge reads the LLM's text with TTS skipped. These test the agent's decisions:
+# which tools it calls and whether it follows the order policy.
+#
+# The seeded orders are in tools.py: 48213 has shipped, 51077 is still processing.
+
+judge:
+  eval:
+    factory: evals.judge.openai_judge
+    model: gpt-4.1
+
+scenarios:
+  # Look up a shipped order, then decline a change it's too late for.
+  - name: shipped_order
+    turns:
+      # The bot greets first on connect, so wait for that before speaking.
+      - expect:
+          - event: response
+            eval: "greets the customer and offers to help with their order"
+
+      - user: "Hi, can you tell me where my order is? It's 48213."
+        expect:
+          - event: function_call
+            calls:
+              - name: get_order
+          - event: response
+            eval: "says the order has shipped, with when it will arrive or its tracking number"
+
+      - user: "Great. Can you switch it to express shipping?"
+        expect:
+          - event: response
+            eval: "says the order has already shipped, so its shipping can't be changed"
+
+  # Confirm with the customer before cancelling a processing order.
+  - name: cancel_order
+    turns:
+      - expect:
+          - event: response
+
+      - user: "I need to cancel my order. The number is 51077."
+        expect:
+          - event: response
+            eval: "asks the customer to confirm they want the order cancelled, without saying it has been cancelled"
+
+      - user: "Yes, please cancel it."
+        expect:
+          - event: function_call
+            calls:
+              - name: cancel_order
+                args: { order_number: "51077" }
+          - event: response
+            eval: "confirms the order has been cancelled"
+
+  # The customer is done: say goodbye and hang up in the same turn.
+  - name: goodbye
+    turns:
+      - expect:
+          - event: response
+
+      - user: "Never mind, I figured it out. Thanks, bye!"
+        expect:
+          - event: function_call
+            calls:
+              - name: end_call
+          # The farewell usually comes before the call, so look back for it.
+          - event: response
+            eval: "says a short goodbye"
+            check_from: turn_start

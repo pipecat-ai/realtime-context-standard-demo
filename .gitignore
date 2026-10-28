@@ -3,6 +3,9 @@
 .env.*
 !env.example
 
+# Pipecat Cloud deploy config (see server/pcc-deploy.example.toml)
+pcc-deploy.toml
+
 # Python
 __pycache__/
 *.py[cod]
@@ -29,3 +32,6 @@ pnpm-debug.log*
 .idea/
 .vscode/
 *.swp
+
+# Evals
+eval-runs/

@@ -1,0 +1,27 @@
+# Runs every scenario against both LLM paths, each run against a fresh bot.
+# From server/:
+#
+#   uv run pipecat eval suite evals/manifest.yaml
+#
+# Add `-p phonellm` or `-p luna` to run one path. Logs and results.jsonl land in
+# evals/eval-runs/<timestamp>/.
+
+concurrency: 2
+runs_dir: eval-runs
+bots_dir: ..
+scenarios_dir: scenarios
+
+suite:
+  # use_tagger true: PhoneLLM Mini writes plain words; the Tone tagger voices them.
+  - bot: bot.py
+    name: phonellm-mini
+    runner_body:
+      data: { use_tagger: true }
+    scenarios: [support_call]
+
+  # use_tagger false: GPT-5.6 Luna writes the expression tags itself.
+  - bot: bot.py
+    name: gpt-5.6-luna
+    runner_body:
+      data: { use_tagger: false }
+    scenarios: [support_call]

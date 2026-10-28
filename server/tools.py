@@ -26,6 +26,10 @@ SHIPPING_COSTS = {"standard": 0.0, "express": 15.0}
 
 NOT_FOUND = {"success": False, "message": "No order matches that order number."}
 
+# A demo always has an order to talk about: a name that matches none gets this
+# one, still processing so that every tool can act on it.
+DEMO_ORDER = "51077"
+
 
 def _digits(order_number: str) -> str:
     # Spoken order numbers reach the LLM with spaces or dashes in them.
@@ -100,7 +104,11 @@ class OrderStore:
             return [order] if order else []
         if name:
             needle = name.strip().lower()
-            return [o for o in self.orders.values() if o["name"].lower() == needle]
+            orders = [o for o in self.orders.values() if o["name"].lower() == needle]
+            if not orders:
+                self.orders[DEMO_ORDER]["name"] = name.strip()
+                orders = [self.orders[DEMO_ORDER]]
+            return orders
         return []
 
 

@@ -1,0 +1,23 @@
+# Pipecat Cloud deploy config, built in the cloud from ./Dockerfile. Copy to
+# pcc-deploy.toml (git-ignored) and deploy to the daily-demos organization:
+#
+#   cp pcc-deploy.example.toml pcc-deploy.toml
+#   pipecat cloud secrets set realtime-context-standard-demo-secrets --file .env --organization daily-demos
+#   pipecat cloud deploy --organization daily-demos
+#
+# Reference: https://docs.pipecat.ai/api-reference/cli/cloud/deploy
+
+agent_name = "realtime-context-standard-demo"
+# Holds the keys in env.example.
+secret_set = "realtime-context-standard-demo-secrets"
+agent_profile = "agent-2x"
+
+# Krisp VIVA voice isolation, applied by the KrispVivaFilter in bot.py. "pro" is
+# the WebRTC model (up to 32 kHz), matching the browser client; "tel" is the
+# telephony model.
+[krisp_viva]
+audio_filter = "pro"
+
+# Warm agents kept ready for new sessions; each one is billed while idle.
+[scaling]
+min_agents = 1
