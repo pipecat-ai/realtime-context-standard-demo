@@ -1,0 +1,21 @@
+[project]
+name = "realtime-context-standard-demo"
+version = "0.1.0"
+description = "Northwind Outfitters support agent: Deepgram Flux, PhoneLLM Mini, Pipecat Tone and ElevenLabs v4"
+requires-python = ">=3.11"
+dependencies = [
+    "pipecat-ai[baseten,cartesia,daily,deepgram,elevenlabs,openai,runner,tone,webrtc]",
+]
+
+[dependency-groups]
+dev = ["pyright>=1.1.404,<2", "ruff>=0.12.11,<1"]
+
+# Pipecat Tone's rc1 models land in pipecat-ai/pipecat#6407. Drop this source and
+# pin a release once it ships.
+[tool.uv.sources]
+pipecat-ai = { git = "https://github.com/pipecat-ai/pipecat.git", branch = "jpt/pipecat-tone-rc1" }
+
+[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+select = ["I", "UP"]
