@@ -36,6 +36,8 @@ interface SegmentDelivery {
  * caller's mood over the call, which the bot works out from the readings.
  */
 interface ExpressionState {
+  /** The bot's final user transcripts, trimmed: what it heard the user say. */
+  heard: Set<string>
   /** Readings of final user transcripts, by their text. */
   perception: Record<string, UserPerceptionSignal[]>
   /** Delivery changes of each bot segment, by segment id. */
@@ -52,13 +54,18 @@ const sameDelivery = (a: string[] | undefined, b: string[]) =>
   a?.join() === b.join()
 
 export const useExpressionStore = create<ExpressionState>()((set) => ({
+  heard: new Set(),
   perception: {},
   segments: {},
   moods: [],
   userInput: ({ text, final, perception }) => {
-    if (!final || !perception) return
+    if (!final) return
+    const line = text.trim()
     set((state) => ({
-      perception: { ...state.perception, [text.trim()]: perception },
+      heard: new Set(state.heard).add(line),
+      perception: perception
+        ? { ...state.perception, [line]: perception }
+        : state.perception,
     }))
   },
   botOutput: ({ segment_id, delivery, spoken_progress }) => {
@@ -79,5 +86,6 @@ export const useExpressionStore = create<ExpressionState>()((set) => ({
     const { value, change, word } = data
     set((state) => ({ moods: [...state.moods, { value, change, word }] }))
   },
-  reset: () => set({ perception: {}, segments: {}, moods: [] }),
+  reset: () =>
+    set({ heard: new Set(), perception: {}, segments: {}, moods: [] }),
 }))

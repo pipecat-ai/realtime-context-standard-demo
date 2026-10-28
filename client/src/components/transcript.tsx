@@ -19,6 +19,13 @@ const BOT_NAME = "sam"
 /** The header switch: shows or hides the reader and tagger rows under the bubbles. */
 const TONE_LABEL = "show tone"
 
+/*
+ * PARTS_IN_ORDER: a message's parts are keyed by position. The conversation
+ * only appends them, so a position always holds the same part, while their
+ * createdAt can repeat: two of the bot's sentences often arrive in the same
+ * millisecond.
+ */
+
 const shortTime = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
 
@@ -69,25 +76,28 @@ function UserTurn({
   showData: boolean
 }) {
   const perception = useExpressionStore((state) => state.perception)
-  const lines = message.parts.map((part) => ({
-    key: part.createdAt,
-    text: partText(part),
-  }))
+  const lines = message.parts.map(partText)
 
   return (
     <Bubble
       message={message}
       data={
         showData
-          ? lines.map(({ key, text }) => {
+          ? lines.map((text, i) => {
               const reading = perception[text.trim()]
-              return reading && <Readings key={key} perception={reading} />
+              return (
+                reading && (
+                  // eslint-disable-next-line @eslint-react/no-array-index-key -- see PARTS_IN_ORDER
+                  <Readings key={i} perception={reading} />
+                )
+              )
             })
           : undefined
       }
     >
-      {lines.map(({ key, text }) => (
-        <p key={key}>{text}</p>
+      {lines.map((text, i) => (
+        // eslint-disable-next-line @eslint-react/no-array-index-key -- see PARTS_IN_ORDER
+        <p key={i}>{text}</p>
       ))}
     </Bubble>
   )
@@ -111,8 +121,9 @@ function BotTurn({
       data={showData ? <TaggedLine parts={message.parts} /> : undefined}
     >
       <p>
-        {words.map(({ createdAt, needsSeparator, text }) => (
-          <Fragment key={createdAt}>
+        {words.map(({ needsSeparator, text }, i) => (
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- see PARTS_IN_ORDER
+          <Fragment key={i}>
             {needsSeparator && " "}
             {typeof text === "object" && text !== null && "spoken" in text ? (
               <>
@@ -131,6 +142,7 @@ function BotTurn({
 
 export function Transcript({ className }: { className?: string }) {
   const { messages } = usePipecatConversation({ includeExpressionEvents: true })
+  const heard = useExpressionStore((state) => state.heard)
   const [showData, setShowData] = useState(true)
   const [userSpeaking, setUserSpeaking] = useState(false)
   useRTVIClientEvent(RTVIEvent.UserStartedSpeaking, () => setUserSpeaking(true))
@@ -138,13 +150,17 @@ export function Transcript({ className }: { className?: string }) {
     setUserSpeaking(false)
   )
 
-  // Flux can send a partial transcript of noise or echo, such as "two" as
-  // the call connects, without starting a turn. Nothing finalizes it, so an
-  // unfinished user line shows only while the user is mid-turn.
+  // Flux can send a partial transcript of noise, such as "two" as the call
+  // connects, outside any turn. The conversation marks it final when the
+  // user next speaks, as if the bot heard it, so a user line shows only
+  // while it's being spoken, or once the bot's final transcript of it comes.
   const turns = messages.flatMap((message) => {
     if (message.role === "assistant") return [message]
     if (message.role !== "user") return []
-    const parts = message.parts.filter((part) => part.final || userSpeaking)
+    const parts = message.parts.filter(
+      (part) =>
+        heard.has(partText(part).trim()) || (userSpeaking && !part.final)
+    )
     return parts.length ? [{ ...message, parts }] : []
   })
 
