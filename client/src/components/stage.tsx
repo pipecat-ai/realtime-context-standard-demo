@@ -1,22 +1,17 @@
 import type { TransportState } from "@pipecat-ai/client-js"
 import { usePipecatClientTransportState } from "@pipecat-ai/client-react"
-import { AnimatePresence, motion } from "motion/react"
-import { useState } from "react"
 
 import { BotAvatar } from "@/components/bot-avatar"
 import { BotAudioControl } from "@/components/pipecat/bot-audio"
 import { UserAudioControl } from "@/components/pipecat/user-audio-control"
 import { CallButton } from "@/components/call-button"
-import { SessionOptions } from "@/components/session-options"
-import {
-  AmbientBackground,
-  ambientPalette,
-  DEFAULT_AMBIENT_PALETTE,
-  PalettePicker,
-} from "@/glass"
+import { SettingsButton } from "@/components/settings-button"
+import { StatusBadge } from "@/components/status-badge"
+import { AmbientBackground } from "@/glass"
 import { useAgentStatus } from "@/hooks/use-agent-status"
+import { moodPalette } from "@/lib/mood-palette"
 import { cn } from "@/lib/utils"
-import { lipsync } from "@/stores/avatar-store"
+import { lipsync, useAvatarStore } from "@/stores/avatar-store"
 
 /** The Deepgram demo's outline button: a 1.5px white ring on no fill. */
 const OUTLINE_PILL =
@@ -25,14 +20,6 @@ const OUTLINE_PILL =
 /** States the call button can start a session from. */
 const CONNECTABLE: TransportState[] = ["initialized", "disconnected", "error"]
 
-/** A fade only, which reduced motion keeps. */
-const FADE = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-  transition: { duration: 0.2 },
-}
-
 interface StageProps {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
@@ -40,76 +27,67 @@ interface StageProps {
   className?: string
 }
 
-/** The agent on the ambient background: its face, status and call button. */
+/**
+ * The agent on the ambient background, which washes to the mood of its
+ * expression: its face over the call button, with its status and the mic,
+ * volume and settings in the top corners.
+ */
 export function Stage({ connect, disconnect, error, className }: StageProps) {
   const transportState = usePipecatClientTransportState()
   const status = useAgentStatus()
-  const [paletteId, setPaletteId] = useState(DEFAULT_AMBIENT_PALETTE)
+  const expression = useAvatarStore((state) => state.expression)
   const connectable = CONNECTABLE.includes(transportState)
 
   return (
-    <div className={cn("flex min-h-0 flex-col gap-3", className)}>
-      {/* Below lg a band of the screen, 40% of its height, enough for Sam's
-          lips to be read, but never short of the call button, leaving the
-          rest to the panels; beside them, all the height there is. */}
-      <section
-        aria-label="Voice agent"
-        className="on-ambient flex h-[40dvh] min-h-40 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1"
+    // Below lg a band of the screen, 40% of its height, enough for Sam's lips
+    // to be read, but never short of the controls, leaving the rest to the
+    // panels; beside them, all the height there is.
+    <section
+      aria-label="Voice agent"
+      className={cn(
+        "on-ambient flex h-[40dvh] min-h-64 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1",
+        className
+      )}
+    >
+      <AmbientBackground
+        palette={moodPalette(expression)}
+        className="flex min-h-0 flex-1 flex-col items-center p-4 sm:p-6"
       >
-        <AmbientBackground
-          palette={ambientPalette(paletteId)}
-          className="flex min-h-0 flex-1 flex-col items-center p-4 sm:p-6"
-        >
-          <BotAvatar className="min-h-0 w-full flex-1" />
-          <p role="status" className="readout-label mt-3" aria-live="polite">
-            {error ?? status}
-          </p>
-          <CallButton
-            status={status}
-            connectable={connectable}
-            onClick={() => {
-              if (!connectable) return void disconnect()
-              // In the tap, so the browser lets the mouth hear the voice.
-              lipsync.resume()
-              void connect()
-            }}
-            disabled={
-              transportState === "initializing" ||
-              transportState === "disconnecting"
-            }
-            className="mt-5"
-          />
-        </AmbientBackground>
-      </section>
-      <footer className="flex min-h-12 shrink-0 flex-wrap items-center gap-3">
-        <UserAudioControl variant="ghost" size="lg" />
-        <BotAudioControl
-          size="icon-lg"
-          variant="outline"
-          align="center"
-          sliderProps={{ orientation: "vertical" }}
-          className={OUTLINE_PILL}
+        {/* Over the avatar's corners, in the background's padding, so the
+            face keeps the full height. Lifted, since the avatar's mask
+            stacks it above anything unlifted before it. */}
+        <div className="absolute inset-x-4 top-4 z-10 flex flex-wrap items-center justify-between gap-3 sm:inset-x-6 sm:top-6">
+          <StatusBadge status={status} error={error} className="min-w-0" />
+          {/* Right-aligned even when a long mic error wraps it under. */}
+          <div className="ml-auto flex items-center gap-3">
+            <UserAudioControl variant="ghost" size="lg" />
+            <BotAudioControl
+              size="icon-lg"
+              variant="outline"
+              align="center"
+              sliderProps={{ orientation: "vertical" }}
+              className={OUTLINE_PILL}
+            />
+            <SettingsButton locked={!connectable} className={OUTLINE_PILL} />
+          </div>
+        </div>
+        <BotAvatar className="min-h-0 w-full flex-1" />
+        <CallButton
+          status={status}
+          connectable={connectable}
+          onClick={() => {
+            if (!connectable) return void disconnect()
+            // In the tap, so the browser lets the mouth hear the voice.
+            lipsync.resume()
+            void connect()
+          }}
+          disabled={
+            transportState === "initializing" ||
+            transportState === "disconnecting"
+          }
+          className="mt-5 sm:mt-6"
         />
-        {/* The bot reads them at the start of a session, so they're gone
-            while one is up. Below lg, on a row of their own under the
-            audio controls and palette. */}
-        <AnimatePresence initial={false}>
-          {connectable && (
-            <motion.div
-              key="session-options"
-              {...FADE}
-              className="max-lg:order-last max-lg:w-full"
-            >
-              <SessionOptions />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <PalettePicker
-          value={paletteId}
-          onChange={setPaletteId}
-          className="ml-auto"
-        />
-      </footer>
-    </div>
+      </AmbientBackground>
+    </section>
   )
 }

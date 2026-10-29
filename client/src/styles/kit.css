@@ -60,12 +60,14 @@
 }
 
 /* Menus and popovers: a lighter panel with rounded corners, a hairline edge
-   and roomy rows. --muted is the volume slider's track. */
+   and roomy rows. --muted is the volume slider's track; --input, the edges of
+   outline toggles and an unchecked switch's track. */
 [data-slot="dropdown-menu-content"],
 [data-slot="popover-content"] {
   --radius: 0.875rem;
   --popover: #1e1e1e;
   --muted: rgb(255 255 255 / 0.14);
+  --input: rgb(255 255 255 / 0.14);
   --accent: rgb(255 255 255 / 0.06);
   --border: rgb(255 255 255 / 0.08);
   box-shadow:

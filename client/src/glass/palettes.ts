@@ -80,6 +80,36 @@ export const AMBIENT_PALETTES: readonly AmbientPalette[] = [
     glowAmount: 0.5,
     shadowAmount: 0.3,
   },
+  {
+    id: "ember",
+    name: "Ember",
+    stops: ["#3a0a0c", "#a3261c", "#c2452e", "#7a2a3a"],
+    glow: "#e0612f",
+    shadow: "#22060a",
+    angle: -6,
+    glowAmount: 0.5,
+    shadowAmount: 0.55,
+  },
+  {
+    id: "dusk",
+    name: "Dusk",
+    stops: ["#232a4f", "#4b5a9a", "#7d8ac4", "#a49ad0"],
+    glow: "#8f9ee0",
+    shadow: "#161a33",
+    angle: 4,
+    glowAmount: 0.35,
+    shadowAmount: 0.45,
+  },
+  {
+    id: "storm",
+    name: "Storm",
+    stops: ["#1d2128", "#3c4450", "#56606c", "#454b5c"],
+    glow: "#6b7584",
+    shadow: "#101318",
+    angle: -4,
+    glowAmount: 0.2,
+    shadowAmount: 0.7,
+  },
 ]
 
 export const DEFAULT_AMBIENT_PALETTE = AMBIENT_PALETTES[0]?.id ?? "plum"
