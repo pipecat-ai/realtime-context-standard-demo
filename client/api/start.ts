@@ -1,4 +1,4 @@
-import { handleBotApi, readBotApiConfig } from "../server/bot-api"
+import { handleBotApi, readBotApiConfig } from "../server/bot-api.js"
 
 const config = readBotApiConfig(process.env)
 
