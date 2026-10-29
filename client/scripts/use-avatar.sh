@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Copies a Pipecat Character Studio export into the client: its data files to
-# public/avatar/, served at /avatar/, and its runtime to src/avatar-runtime/.
-# Re-run with a newer export of the character to update both.
+# public/avatar/, served at /avatar/, and its runtime to src/avatar-runtime/,
+# with this demo's addition applied (avatar-runtime.patch: speech that moves
+# the head, brows and eyes). Re-run with a newer export of the character to
+# update both.
 #
 #   scripts/use-avatar.sh ~/Sites/pipecat-character-studio/out/exports/pipecat-momo-20261028-215559
 set -euo pipefail
@@ -18,5 +20,9 @@ mkdir -p "$client/public/avatar" "$client/src/avatar-runtime"
 cp "$bundle"/{character.svg,rig.json,face.json,animation.json} "$client/public/avatar/"
 cp "$bundle"/runtime/{avatar-runtime.js,avatar-runtime.d.ts,avatar-react.js,avatar-react.d.ts,NOTICE.md} \
   "$client/src/avatar-runtime/"
+git -C "$client/.." apply "$client/scripts/avatar-runtime.patch" || {
+  echo "scripts/avatar-runtime.patch doesn't fit this export's runtime: make its changes by hand" >&2
+  exit 1
+}
 printf '{ "bundle": "%s" }\n' "$(basename "$bundle")" > "$client/public/avatar/source.json"
 echo "public/avatar/ and src/avatar-runtime/ from $(basename "$bundle")"

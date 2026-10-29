@@ -60,6 +60,12 @@ export interface SpeechSample {
   relTime: number | null;
   /** The events active at this moment. */
   events: LipsyncEvent[];
+  /**
+   * realtime-context-standard-demo: the speech's own acting, which the creator's export lacks (scripts/use-avatar.sh
+   * applies it). `pose` is added to the frame's pose, its head, brows and eyes scaled by the motion (none with reduced
+   * motion); `relax` (0–1) eases the expression's smile and smirk towards rest.
+   */
+  gesture?: { pose?: Partial<Pose>; relax?: number };
 }
 
 /** Where a player's speech comes from. `sample` never returns null: with nothing to say it reports rest, not speaking. */

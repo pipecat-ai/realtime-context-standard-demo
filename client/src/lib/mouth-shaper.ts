@@ -13,7 +13,9 @@ import type {
  * with the voice's loudness, in a speaking range; the phones say where the
  * lips meet, round and spread, timed against the analysis's closures; and
  * every control is smoothed around the moment shown, which the batches and
- * phones arrive far enough ahead of to allow.
+ * phones arrive far enough ahead of to allow. While she talks, her lips draw
+ * in from their rest and purse a little, so she talks with a mouth, not a
+ * flap the width of her smile.
  */
 
 /** One analyzer keyframe: seconds into its utterance, and the wire's 0–1 controls. */
@@ -23,6 +25,8 @@ export interface Keyframe {
   width: number
   rounding: number
   energy: number
+  /** Within the voice's range so far, 0–1; 0 unvoiced. */
+  pitch: number
 }
 
 /** A phone of a spoken word (server/avatar/phones.py): seconds into its utterance. */
@@ -56,17 +60,24 @@ const MOUTH = {
   phoneShare: 0.6,
   /** The rig openness of a loud, open vowel: about two-fifths as tall as the mouth is wide. */
   maxOpen: 0.5,
+  /** The lips' width at rest, and talking between vowels: drawn in and a little pursed. */
+  restWidth: 0.47,
+  talkWidth: 0.44,
+  talkRound: 0.2,
   /** Without phones: the analyzer's rounding and width that start and complete a shape. */
   roundFrom: 0.45,
   roundTo: 0.9,
-  maxRound: 0.42,
+  maxRound: 0.5,
   spreadFrom: 0.5,
   spreadTo: 0.95,
-  restWidth: 0.47,
-  maxWidth: 0.72,
+  maxWidth: 0.6,
   /** Gaussian smoothing, seconds: the opening follows syllables, shapes the vowel. */
   openSigma: 0.022,
   shapeSigma: 0.05,
+  /** Talking is the voice over this σ, from `talkFrom` to `talkTo`: it holds through words, not pauses. */
+  talkSigma: 0.1,
+  talkFrom: 0.1,
+  talkTo: 0.4,
   /** Lips take at most this long to close before a closure, and to part after it. */
   closeLead: 0.07,
   closeRelease: 0.06,
@@ -99,8 +110,8 @@ const vowel = (open: number, width: number, round = 0): Viseme => ({
 })
 const consonant = (
   open: number,
-  width = 0.5,
-  round = 0,
+  width = MOUTH.talkWidth,
+  round = MOUTH.talkRound,
   weight = 0.25
 ): Viseme => ({
   open,
@@ -109,37 +120,41 @@ const consonant = (
   weight,
 })
 
-/** ARPAbet without stress. Consonants weigh little: they take the lips of the vowels around them. */
+/**
+ * ARPAbet without stress. Rounding draws the corners in and lifts the upper
+ * lip, so the open vowels keep some: an oval rather than a slot. Consonants
+ * weigh little: they take the lips of the vowels around them.
+ */
 const VISEMES: Record<string, Viseme> = {
-  AA: vowel(1, 0.52),
-  AH: vowel(0.8, 0.52),
-  AE: vowel(0.9, 0.6),
-  AW: vowel(0.95, 0.5, 0.1),
-  AY: vowel(0.95, 0.56),
-  AO: vowel(0.85, 0.46, 0.22),
-  EH: vowel(0.75, 0.58),
-  EY: vowel(0.6, 0.62),
-  IH: vowel(0.5, 0.63),
-  IY: vowel(0.35, 0.68),
-  ER: vowel(0.45, 0.47, 0.18),
-  OW: vowel(0.7, 0.45, 0.34),
-  OY: vowel(0.75, 0.46, 0.28),
-  UH: vowel(0.5, 0.44, 0.32),
-  UW: vowel(0.4, 0.42, 0.42),
-  W: consonant(0.25, 0.4, 0.45, 1),
-  R: consonant(0.35, 0.47, 0.2, 0.6),
-  Y: consonant(0.3, 0.62, 0, 0.6),
-  F: consonant(0.12, 0.56, 0, 0.8),
-  V: consonant(0.12, 0.56, 0, 0.8),
-  SH: consonant(0.3, 0.45, 0.28, 0.7),
-  ZH: consonant(0.3, 0.45, 0.28, 0.7),
-  CH: consonant(0.3, 0.45, 0.28, 0.7),
-  JH: consonant(0.3, 0.45, 0.28, 0.7),
-  S: consonant(0.2, 0.58),
-  Z: consonant(0.2, 0.58),
-  P: consonant(0, 0.5, 0, 0.5),
-  B: consonant(0, 0.5, 0, 0.5),
-  M: consonant(0, 0.5, 0, 0.5),
+  AA: vowel(1, 0.44, 0.24),
+  AH: vowel(0.8, 0.43, 0.26),
+  AE: vowel(0.9, 0.47, 0.2),
+  AW: vowel(0.95, 0.42, 0.3),
+  AY: vowel(0.95, 0.46, 0.22),
+  AO: vowel(0.85, 0.41, 0.36),
+  EH: vowel(0.75, 0.47, 0.18),
+  EY: vowel(0.6, 0.52, 0.14),
+  IH: vowel(0.5, 0.52, 0.14),
+  IY: vowel(0.35, 0.62, 0.06),
+  ER: vowel(0.45, 0.42, 0.32),
+  OW: vowel(0.7, 0.4, 0.44),
+  OY: vowel(0.75, 0.41, 0.38),
+  UH: vowel(0.5, 0.4, 0.42),
+  UW: vowel(0.4, 0.38, 0.54),
+  W: consonant(0.25, 0.36, 0.6, 1),
+  R: consonant(0.35, 0.42, 0.34, 0.6),
+  Y: consonant(0.3, 0.54, 0.1, 0.6),
+  F: consonant(0.12, 0.48, 0.1, 0.8),
+  V: consonant(0.12, 0.48, 0.1, 0.8),
+  SH: consonant(0.3, 0.4, 0.42, 0.7),
+  ZH: consonant(0.3, 0.4, 0.42, 0.7),
+  CH: consonant(0.3, 0.4, 0.42, 0.7),
+  JH: consonant(0.3, 0.4, 0.42, 0.7),
+  S: consonant(0.2, 0.5, 0.1),
+  Z: consonant(0.2, 0.5, 0.1),
+  P: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),
+  B: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),
+  M: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),
 }
 const OTHER_CONSONANT = consonant(0.35)
 const BILABIALS = new Set(["P", "B", "M"])
@@ -160,7 +175,14 @@ function keyframeAt(keyframes: readonly Keyframe[], offset: number): Keyframe {
   const first = keyframes[0]
   const last = keyframes.at(-1)
   if (!first || !last || offset < first.offset || offset > last.offset) {
-    return { offset, openness: 0, width: 0.35, rounding: 0.35, energy: 0 }
+    return {
+      offset,
+      openness: 0,
+      width: 0.35,
+      rounding: 0.35,
+      energy: 0,
+      pitch: 0,
+    }
   }
   let lo = 0
   let hi = keyframes.length - 1
@@ -179,6 +201,7 @@ function keyframeAt(keyframes: readonly Keyframe[], offset: number): Keyframe {
     width: a.width + (b.width - a.width) * t,
     rounding: a.rounding + (b.rounding - a.rounding) * t,
     energy: a.energy + (b.energy - a.energy) * t,
+    pitch: a.pitch + (b.pitch - a.pitch) * t,
   }
 }
 
@@ -205,6 +228,23 @@ function gaussian(offset: number, sigma: number, read: (at: number) => number) {
     weights += weight
   }
   return sum / weights
+}
+
+/** How loud the voice is at `t`, as the share of a full opening it allows. */
+const voiceAt = (track: SpeechTrack, t: number, p: MouthParams) =>
+  ramp(p.quiet, p.loud, keyframeAt(track.keyframes, t).energy)
+
+/**
+ * How far Sam is talking at `offset` (0–1): her voice over the syllables
+ * around it, so it holds through a phrase and lets go in a pause.
+ */
+export function talkAt(
+  track: SpeechTrack,
+  offset: number,
+  p: MouthParams = MOUTH
+) {
+  const voice = gaussian(offset, p.talkSigma, (t) => voiceAt(track, t, p))
+  return ramp(p.talkFrom, p.talkTo, voice)
 }
 
 /**
@@ -315,8 +355,6 @@ function shapeMouth(
   offset: number,
   p: MouthParams = MOUTH
 ): Articulation {
-  const voiceAt = (t: number) =>
-    ramp(p.quiet, p.loud, keyframeAt(track.keyframes, t).energy)
   const phoned = track.phones.length > 0
   const openAt = (t: number) => {
     const k = keyframeAt(track.keyframes, t)
@@ -324,7 +362,7 @@ function shapeMouth(
     const phone = phoned ? phoneAt(track.phones, t) : null
     const viseme = phone ? (VISEMES[phone.phone] ?? OTHER_CONSONANT) : null
     const height = viseme ? heard + (viseme.open - heard) * p.phoneShare : heard
-    return voiceAt(t) * (1 - p.heightShare + p.heightShare * height)
+    return voiceAt(track, t, p) * (1 - p.heightShare + p.heightShare * height)
   }
   const openness = p.maxOpen * gaussian(offset, p.openSigma, openAt)
 
@@ -336,31 +374,32 @@ function shapeMouth(
   for (let i = -12; i <= 12; i++) {
     const t = offset + (i * p.shapeSigma) / 6
     const kernel = Math.exp(-(i * i) / 72)
-    const voice = voiceAt(t)
     const phone = phoned ? phoneAt(track.phones, t) : null
     let shape: { width: number; round: number; weight: number }
     if (phone) {
       shape = VISEMES[phone.phone] ?? OTHER_CONSONANT
     } else {
       const k = keyframeAt(track.keyframes, t)
+      const spread = ramp(p.spreadFrom, p.spreadTo, k.width)
+      const round = ramp(p.roundFrom, p.roundTo, k.rounding)
       shape = {
-        width:
-          p.restWidth +
-          (p.maxWidth - p.restWidth) * ramp(p.spreadFrom, p.spreadTo, k.width),
-        round: p.maxRound * ramp(p.roundFrom, p.roundTo, k.rounding),
+        width: p.talkWidth + (p.maxWidth - p.talkWidth) * spread,
+        round: p.talkRound + (p.maxRound - p.talkRound) * round,
         weight: 0.3,
       }
     }
-    // Silence relaxes the lips to their rest.
     const w = kernel * shape.weight
-    width += w * (p.restWidth + (shape.width - p.restWidth) * voice)
-    rounding += w * shape.round * voice
+    width += w * shape.width
+    rounding += w * shape.round
     weights += w
   }
+  // The lips relax to rest as she stops talking, not between syllables.
+  const talk = talkAt(track, offset, p)
+  const shaped = weights > 0 ? width / weights : p.restWidth
   return {
     openness: openness * (1 - closedAt(closures(track, offset, p), offset)),
-    width: weights > 0 ? width / weights : p.restWidth,
-    rounding: weights > 0 ? rounding / weights : 0,
+    width: p.restWidth + (shaped - p.restWidth) * talk,
+    rounding: (weights > 0 ? rounding / weights : 0) * talk,
     energy: keyframeAt(track.keyframes, offset).energy,
   }
 }

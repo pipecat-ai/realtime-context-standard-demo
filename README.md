@@ -121,15 +121,21 @@ avatar on the ambient background; the side panel shows the transcript, tool call
 and latency.
 
 The avatar is Momo, exported from Pipecat Character Studio: her data files are in
-`client/public/avatar/` and the runtime that plays them in `client/src/avatar-runtime/`.
-`client/scripts/use-avatar.sh <export folder>` copies in a newer export. Her mouth is
-shaped by `client/src/lib/mouth-shaper.ts` from the bot's lipsync batches and phones: it
-opens with the voice's loudness in a speaking range, its lips meet, round and spread
-where the phones say, timed against the analysis's closures, and every control is
-smoothed around the moment shown. `client/src/lib/lipsync-aligner.ts` keeps it on the
-voice as it's heard: it matches the batches' energy against the bot's audio as it plays,
-and delays the mouth by the lag between them. Each line's expression and gesture, from
-the avatar director, plays as the line is heard.
+`client/public/avatar/` and the runtime that plays them in `client/src/avatar-runtime/`,
+with one addition, `client/scripts/avatar-runtime.patch`, that lets speech move more
+than her mouth. `client/scripts/use-avatar.sh <export folder>` copies in a newer export
+and applies it. Her mouth is shaped by `client/src/lib/mouth-shaper.ts` from the bot's
+lipsync batches and phones: it opens with the voice's loudness in a speaking range, its
+lips meet, round and spread where the phones say, timed against the analysis's closures,
+they draw in and purse a little while she talks, and every control is smoothed around
+the moment shown. `client/src/lib/speech-gesture.ts` moves the rest of her face with it:
+her head dips into the syllables that stand out by loudness and pitch, her brows lift
+with the high ones, her head tilts a little differently each phrase, she blinks as a
+phrase starts after a pause, and her expression's smile eases while she talks.
+`client/src/lib/lipsync-aligner.ts` keeps it all on the voice as it's heard: it matches
+the batches' energy against the bot's audio as it plays, and delays the face by the lag
+between them. Each line's expression and gesture, from the avatar director, plays as the
+line is heard.
 
 Under each user line are the Tone reader's emotion and sarcasm; under
 each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and

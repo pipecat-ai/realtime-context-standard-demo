@@ -2635,6 +2635,20 @@ var sanitize = (a) => ({
   energy: clamp(a.energy ?? 0)
 });
 var atRest = (a) => Math.abs(a.openness - REST_ARTICULATION.openness) <= OWNER_EPSILON && Math.abs(a.width - REST_ARTICULATION.width) <= OWNER_EPSILON && Math.abs(a.rounding - REST_ARTICULATION.rounding) <= OWNER_EPSILON && Math.abs(a.energy - REST_ARTICULATION.energy) <= OWNER_EPSILON;
+// realtime-context-standard-demo: the speech's own acting (SpeechSample.gesture), from the host. Not in the creator's
+// export: client/scripts/use-avatar.sh applies it to each new one.
+var GESTURE_MOUTH_KEYS = /* @__PURE__ */ new Set(["smile", "smirk", "restOpen"]);
+function gestured(pose, gesture, amount) {
+  if (!gesture) return pose;
+  const out = { ...pose };
+  const relax = clamp(gesture.relax ?? 0);
+  out.smile = 1 + (out.smile - 1) * (1 - relax);
+  out.smirk *= 1 - relax;
+  for (const [key, value] of Object.entries(gesture.pose ?? {})) {
+    if (isPoseKey(key) && Number.isFinite(value)) out[key] += value * (GESTURE_MOUTH_KEYS.has(key) ? 1 : amount);
+  }
+  return out;
+}
 var AvatarFrameDriver = class {
   constructor(nowMs2, wallMs = nowMs2, options = {}) {
     __publicField(this, "headInertia", new HeadInertia());
@@ -2712,7 +2726,8 @@ var AvatarFrameDriver = class {
       amount: motion,
       reducedMotion
     });
-    const { pose, motion: frame } = acted;
+    const { motion: frame } = acted;
+    const pose = gestured(acted.pose, speech?.gesture, reducedMotion ? 0 : motion);
     const playing = acted.reaction ? this.reactionOf(acted.reaction.id) : void 0;
     const effects = this.effects.step({
       expression: this.current,
@@ -3867,7 +3882,7 @@ var Animator = class {
     }
     const sample = this.source.sample(now);
     this.sample = sample;
-    return { articulation: this.damping.step(mapSpeechToRig(sample), sample, now), speaking: sample.speaking };
+    return { articulation: this.damping.step(mapSpeechToRig(sample), sample, now), speaking: sample.speaking, gesture: sample.gesture };
   }
   /**
    * The kept frame's effects (docs/animate.md "Effects"), about the eyes' midpoint at actingScale × EFFECT_SCALE px an

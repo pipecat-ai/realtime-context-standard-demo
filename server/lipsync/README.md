@@ -20,10 +20,13 @@ Measured on ElevenLabs River, the bot's voice, against the TTS's character timin
   from shut to wide open at every syllable (mean 60 local px on Momo's 175 px mouth), the
   second formant rounds the lips as much on "m", "n" and "l" as on "oo", and openness holds
   through pauses. So the client shapes the mouth itself (`client/src/lib/mouth-shaper.ts`):
-  loudness opens it in a speaking range, and the phones of the words, which
-  `server/avatar/phones.py` times, say where the lips meet, round and spread. On twelve River
-  lines: lips meet on 91% of "m", "b" and "p" (67% before), "ee" is 15 px wider than "oo"
-  (8), the opening is a mean 28 px (60), and the motion is a sixth as rough.
+  loudness opens it in a speaking range, the phones of the words, which
+  `server/avatar/phones.py` times, say where the lips meet, round and spread, and talking
+  draws the lips in and purses them a little. On twelve River lines: lips meet on 91% of
+  "m", "b" and "p" (67% before), the open mouth is three-quarters of its rest width (92%),
+  "ee" is 26 px wider than "oo" (8), the opening is a mean 29 px (60), and the motion is a
+  sixth as rough. The analysis's energy and pitch also move the head, brows and eyes
+  (`client/src/lib/speech-gesture.ts`).
 - Text events (`LipsyncProcessor(text_events=True)`) would read the words for closures, but
   they give up on a TTS context with more than one sentence, and Pipecat keeps one context
   per reply, so they stay off.

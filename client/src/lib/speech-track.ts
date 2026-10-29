@@ -74,7 +74,7 @@ export function createSpeechTrack(): SpeechTrackBuilder {
         windows.push({ start: data.ws, t0: data.t0 })
         windows.sort((a, b) => a.start - b.start)
         for (const row of data.kf) {
-          const [offset, openness, width, rounding, energy] = row
+          const [offset, openness, width, rounding, energy, pitch] = row
           if (energy === undefined) continue
           keyframes.push({
             offset: (offset ?? 0) + data.t0,
@@ -82,6 +82,7 @@ export function createSpeechTrack(): SpeechTrackBuilder {
             width: width ?? 0,
             rounding: rounding ?? 0,
             energy,
+            pitch: pitch ?? 0,
           })
         }
         keyframes.sort((a, b) => a.offset - b.offset)
