@@ -3,7 +3,10 @@ import type { ReactNode } from "react"
 import { SectionLabel } from "@/components/meters"
 import { cn } from "@/lib/utils"
 
-/** A side panel card: one question per panel, named in its label row. */
+/**
+ * A section of the side panel: one question per panel, named in its label
+ * row. The side panel draws the rules between them.
+ */
 export function Panel({
   title,
   right,
@@ -18,12 +21,9 @@ export function Panel({
   return (
     <section
       aria-label={title}
-      className={cn(
-        "flex min-h-0 flex-col rounded-2xl border bg-card",
-        className
-      )}
+      className={cn("flex min-h-0 flex-col", className)}
     >
-      <div className="shrink-0 px-4 pt-3">
+      <div className="shrink-0 px-4 pt-4">
         <SectionLabel left={title} right={right} />
       </div>
       {children}

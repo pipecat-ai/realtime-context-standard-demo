@@ -27,16 +27,20 @@ interface SessionProps {
 /**
  * One screen, never scrolled: the stage over the timeline on the left and the
  * transcript, mood, tool calls and metrics on the right, or below lg, the
- * stage and timeline over the panel the tab bar picks.
+ * stage and timeline over the panel the tab bar picks. The side panel runs
+ * to the window's edges; only the stage's side is inset, and on phones the
+ * stage runs to them too, square, leaving only the timeline inset.
  */
 function Session(props: SessionProps) {
   useExpressionEvents()
 
   return (
-    <div className="flex h-dvh flex-col gap-3 p-3 sm:p-4 lg:flex-row">
-      <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-1">
-        <Stage {...props} className="lg:flex-1" />
-        <Timeline className="shrink-0" />
+    <div className="flex h-dvh flex-col lg:flex-row">
+      <div className="flex min-w-0 shrink-0 flex-col gap-3 pb-3 sm:p-4 lg:min-h-0 lg:flex-1">
+        <Stage {...props} className="max-sm:rounded-none lg:flex-1" />
+        {/* The timeline keeps room above its lanes for backchannel labels,
+            which on phones is gap enough, so it takes back the column's. */}
+        <Timeline className="shrink-0 max-sm:-mt-3 max-sm:px-3" />
       </div>
       <SidePanel className={SIDE_PANEL} />
     </div>

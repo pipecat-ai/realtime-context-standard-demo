@@ -26,7 +26,7 @@ export function Mood({ className }: { className?: string }) {
 
   return (
     <Panel title="caller mood" className={className}>
-      <div className="flex min-w-0 items-center gap-3 px-4 pb-4 font-mono text-xs">
+      <div className="flex min-w-0 items-center gap-3 px-4 pt-3 pb-4 font-mono text-xs">
         <span className="w-20 shrink-0 font-bold uppercase" style={{ color }}>
           {word}
         </span>

@@ -27,7 +27,7 @@ export function Metrics({ className }: { className?: string }) {
 
   return (
     <Panel title="latency · ttfb" right="0–1 s" className={className}>
-      <dl className="grid grid-cols-[3rem_auto_4rem_1fr] items-center gap-x-3 gap-y-2 px-4 pb-4 font-mono text-xs">
+      <dl className="grid grid-cols-[3rem_auto_4rem_1fr] items-center gap-x-3 gap-y-2 px-4 pt-3 pb-4 font-mono text-xs">
         {STAGES.map(({ label, processor }) => {
           const stage = series.find(
             (s) => s.category === "ttfb" && processor.test(s.processor)

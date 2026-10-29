@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { MoodIcon } from "@/components/mood-icon"
 import { useGlassPane, useGlassScene } from "@/glass"
 import type { AgentStatus } from "@/hooks/use-agent-status"
-import { moodPalette } from "@/lib/mood-palette"
 import { cn } from "@/lib/utils"
 
 /**
@@ -38,14 +37,26 @@ const FALL = {
 /** and its chip fades as it lands. */
 const FADE = { delay: HOLD + 0.25, duration: 0.4 } as const
 
+/** Each expression's chip, in a colour of its mood. */
+const CHIP: Record<string, string> = {
+  neutral: "bg-expression-neutral",
+  happy: "bg-expression-happy",
+  excited: "bg-expression-excited",
+  thinking: "bg-expression-thinking",
+  scheming: "bg-expression-scheming",
+  upset: "bg-expression-upset",
+  lose: "bg-expression-lose",
+  angry: "bg-expression-angry",
+  win: "bg-expression-win",
+}
+
 /**
- * Sam's face, too small to read in passing: so a new one starts big, on a
- * chip of the stage's light for its mood, and falls back into the badge. Under
- * reduced motion, just the chip.
+ * Sam's face, too small to read in passing: so a new one starts big, dark on
+ * a chip of its mood's colour, and falls back into the badge. Under reduced
+ * motion, just the chip.
  */
 function Face({ expression }: { expression: string }) {
   const reduceMotion = useReducedMotion()
-  const { glow } = moodPalette(expression)
 
   return (
     // Holds the face's place in the row; the chip overhangs it a little.
@@ -56,26 +67,23 @@ function Face({ expression }: { expression: string }) {
           initial={{
             opacity: 0,
             scale: reduceMotion ? 1 : START_SCALE,
-            backgroundColor: glow,
-            color: "var(--glow-foreground)",
+            color: "var(--expression-foreground)",
           }}
-          // To the glow, clear, so the fade keeps its hue.
-          animate={{
-            opacity: 1,
-            scale: 1,
-            backgroundColor: `${glow}00`,
-            color: "var(--foreground)",
-          }}
+          animate={{ opacity: 1, scale: 1, color: "var(--foreground)" }}
           exit={{ opacity: 0, transition: { duration: 0 } }}
-          transition={{
-            opacity: APPEAR,
-            scale: FALL,
-            backgroundColor: FADE,
-            color: FADE,
-          }}
-          className="absolute -inset-0.5 grid place-items-center rounded-full"
+          transition={{ opacity: APPEAR, scale: FALL, color: FADE }}
+          className="absolute -inset-0.5 grid place-items-center"
         >
-          <MoodIcon expression={expression} className="size-4" />
+          <motion.span
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={FADE}
+            className={cn(
+              "absolute inset-0 rounded-full",
+              CHIP[expression] ?? CHIP.neutral
+            )}
+          />
+          <MoodIcon expression={expression} className="relative size-4" />
         </motion.span>
       </AnimatePresence>
     </span>

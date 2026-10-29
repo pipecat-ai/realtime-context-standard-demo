@@ -45,7 +45,7 @@ function PanelTabs({
         if (isPanel(value)) onShow(value)
       }}
       className={cn(
-        "grid w-full shrink-0 grid-cols-4 rounded-2xl border bg-card p-1",
+        "grid w-full shrink-0 grid-cols-4 rounded-none border-t p-1",
         className
       )}
     >
@@ -63,10 +63,14 @@ function PanelTabs({
   )
 }
 
+/** Beside the stage, a rule between each panel and the next. */
+const DIVIDED = "lg:border-b"
+
 /**
  * The session as it happens: the transcript, mood, tool calls and latency,
  * stacked beside the stage, or below lg one at a time, from a tab bar. All
- * stay mounted, so a hidden one keeps counting, chiming and charting.
+ * stay mounted, so a hidden one keeps counting, chiming and charting. One
+ * flush column, ruled off from the stage (above it below lg).
  */
 export function SidePanel({ className }: { className?: string }) {
   const [shown, setShown] = useState<PanelId>("transcript")
@@ -75,13 +79,16 @@ export function SidePanel({ className }: { className?: string }) {
   return (
     <aside
       aria-label="Session"
-      className={cn("flex min-h-0 flex-col gap-3", className)}
+      className={cn(
+        "flex min-h-0 flex-col border-t bg-card lg:border-t-0 lg:border-l",
+        className
+      )}
     >
       <Transcript
-        className={cn("min-h-0 flex-1", hiddenBelowLg("transcript"))}
+        className={cn("min-h-0 flex-1", DIVIDED, hiddenBelowLg("transcript"))}
       />
-      <Mood className={cn("shrink-0", hiddenBelowLg("mood"))} />
-      <ToolCalls className={cn("shrink-0", hiddenBelowLg("tools"))} />
+      <Mood className={cn("shrink-0", DIVIDED, hiddenBelowLg("mood"))} />
+      <ToolCalls className={cn("shrink-0", DIVIDED, hiddenBelowLg("tools"))} />
       <Metrics className={cn("shrink-0", hiddenBelowLg("latency"))} />
       <PanelTabs
         shown={shown}

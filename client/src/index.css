@@ -56,6 +56,15 @@
   --color-tag-breath: var(--tag-breath);
   --color-tag-sound: var(--tag-sound);
   --color-tag-pause: var(--tag-pause);
+  --color-expression-neutral: var(--expression-neutral);
+  --color-expression-happy: var(--expression-happy);
+  --color-expression-excited: var(--expression-excited);
+  --color-expression-thinking: var(--expression-thinking);
+  --color-expression-scheming: var(--expression-scheming);
+  --color-expression-upset: var(--expression-upset);
+  --color-expression-lose: var(--expression-lose);
+  --color-expression-angry: var(--expression-angry);
+  --color-expression-win: var(--expression-win);
   /* Sam cast on the background: a hard, faint offset copy of her outline,
      which lifts her off it. */
   --drop-shadow-avatar: 6px 8px 0 rgb(0 0 0 / 0.15);
@@ -83,49 +92,52 @@
       );
     }
   }
-  /* Now and then, while no call is up, a spark runs a lap of the Start
-     button's rim, easing off the mark and into the finish, and the button
-     flashes as it gets home (components/rim-spark.tsx). The three run on one
-     clock: the spark's run, its fade in and out, and the flash. */
+  /* Now and then, while no call is up, a shine runs a lap of the Start
+     button's rim (components/rim-spark.tsx). It eases off the mark, gets home
+     still moving, and fades out as it carries on, so it never stalls at the
+     finish; the button flashes as it passes home. The three run on one
+     clock: the shine's run, its fade in and out, and the flash. */
   --animate-rim-spark: rim-spark 6s 1.5s infinite;
   --animate-rim-spark-fade: rim-spark-fade 6s 1.5s infinite;
   --animate-rim-flash: rim-flash 6s 1.5s infinite;
 
-  /* A dash offset of 100 is one lap of a pathLength-100 rim. */
+  /* A dash offset of 100 is one lap of a pathLength-100 rim; it runs on to
+     125, a quarter lap past home, fading. With this easing it's home at
+     about 22% of the clock. */
   @keyframes rim-spark {
     0% {
       stroke-dashoffset: 0;
-      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+      animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
     }
-    26%,
+    32%,
     100% {
-      stroke-dashoffset: 100;
+      stroke-dashoffset: 125;
     }
   }
 
   @keyframes rim-spark-fade {
     0%,
-    27%,
+    30%,
     100% {
       opacity: 0;
     }
     4%,
-    21% {
+    20% {
       opacity: 1;
     }
   }
 
   @keyframes rim-flash {
     0%,
-    24%,
+    19%,
     100% {
       opacity: 0;
     }
-    27% {
+    23% {
       opacity: 0.14;
       animation-timing-function: ease-out;
     }
-    40% {
+    36% {
       opacity: 0;
     }
   }
@@ -177,6 +189,18 @@
   --tag-breath: #73daca;
   --tag-sound: #e0af68;
   --tag-pause: var(--faint);
+  /* Sam's expressions (public/avatar/animation.json), each in a colour of
+     its mood, light enough to take dark on top. */
+  --expression-neutral: #d4d8e8;
+  --expression-happy: #ecd06f;
+  --expression-excited: #ff9e64;
+  --expression-thinking: #73daca;
+  --expression-scheming: #c792ea;
+  --expression-upset: #7aa2f7;
+  --expression-lose: #8b93ad;
+  --expression-angry: #f7768e;
+  --expression-win: #9ece6a;
+  --expression-foreground: #0a0a0a;
 }
 
 @layer base {
@@ -194,10 +218,9 @@
 }
 
 /* Over the ambient background: white text, and borders and fills that let
-   the palette show through; dark on a fill of a palette's glow. */
+   the palette show through. */
 .on-ambient {
   --foreground: #ffffff;
-  --glow-foreground: #0a0a0a;
   --muted-foreground: rgb(255 255 255 / 0.72);
   --border: rgb(255 255 255 / 0.2);
   --input: rgb(255 255 255 / 0.2);
