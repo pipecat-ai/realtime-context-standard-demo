@@ -46,7 +46,8 @@ Deepgram Flux (STT) → Tone reader → avatar listener → PhoneLLM Mini on Bas
   transcript as each phrase ends, at most every second and a half, for a reaction
   (shocked, a laugh, a sympathetic shake of the head) and the face Sam listens with. A
   reading that comes back after the user has said much more is dropped, a reaction
-  replaces the nod it lands with, and each plays once a turn.
+  replaces the nod it lands with, and each plays once a turn. A turn the Tone reader
+  reads as angry takes Sam aback as it ends: she looks shocked until she answers.
 - **Tone tagger** voices each sentence the LLM writes with the TTS's tags, breaths
   included.
 - **Phone timer** (`server/avatar/phones.py`) looks up the phones of each word the TTS
@@ -173,8 +174,8 @@ pnpm dev
 
 The browser only calls `/api/start` (`client/server/bot-api.ts`, served by Vite in
 dev and by the Vercel functions in `client/api/` in production), which holds the
-Pipecat Cloud key and forwards only the `tts`, `use_tagger` and `detect_backchannels`
-options.
+Pipecat Cloud key and forwards only the `tts`, `use_tagger`, `detect_backchannels` and
+`demo` options.
 
 Client env, in `client/.env.local` (from `client/env.example`), or the Vercel
 project's environment in production:

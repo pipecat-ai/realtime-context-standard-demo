@@ -12,7 +12,8 @@ from the customer's audio as it arrives, with no model. The reactions come from
 Jev, which reads the customer's newest words in Flux's interim transcript, a few
 words at a time and about once a second at most; a reading that comes back after
 the customer has said much more is dropped, so Sam never reacts to something said
-several words back.
+several words back. And when a turn ends that the Tone reader reads as angry, Sam
+is taken aback by it, with no model of its own.
 """
 
 import asyncio
@@ -80,11 +81,15 @@ READ_TIMEOUT_SECS = 0.8
 # customer's words most of all: Momo's is a full one), while the customer has
 # said at most STALE_WORDS more, REACTION_GAP_SECS after the last one, and each
 # once a turn. A face changes with MIN_FACE of it, and holds FACE_HOLD_SECS.
-MIN_REACTION = {"shocked": 0.7, "shake": 0.75, "laugh": 0.85}
+MIN_REACTION = {"shocked": 0.7, "shake": 0.75, "laugh": 0.8}
 STALE_WORDS = 6
 REACTION_GAP_SECS = 6.0
 MIN_FACE = 0.55
 FACE_HOLD_SECS = 2.5
+# A turn the Tone reader reads as angry, this sure, takes Sam aback as it ends:
+# she's shocked until she answers.
+ANGRY = 0.8
+SARCASTIC = 0.5
 
 
 @dataclass
@@ -239,6 +244,8 @@ class AvatarListener(FrameProcessor):
             if self._listening:
                 self._words = frame.text.split()
                 self._maybe_read(final=isinstance(frame, TranscriptionFrame))
+                if isinstance(frame, TranscriptionFrame):
+                    await self._react_to_reading(frame)
 
     async def cleanup(self):
         await super().cleanup()
@@ -296,6 +303,22 @@ class AvatarListener(FrameProcessor):
         self._reading = self.create_task(
             self._read_words_heard(before, newest, self._turn), f"listen-{self._turn}"
         )
+
+    async def _react_to_reading(self, frame: TranscriptionFrame):
+        """Takes Sam aback at a turn the Tone reader reads as angry."""
+        emotion = next((s for s in frame.perception or [] if s.name == "emotion"), None)
+        if not emotion or not emotion.labels or "shocked" in self._reacted:
+            return
+        label, sure = emotion.labels[0]
+        sarcasm = next((s.value for s in frame.perception or [] if s.name == "sarcasm"), None)
+        # Sarcasm reads as angry too, but it's a jab, not an outburst.
+        if label != "angry" or sure < ANGRY or (sarcasm or 0) >= SARCASTIC:
+            return
+        logger.debug(f"{self}: angry {sure:.2f} → shocked")
+        self._reacted.add("shocked")
+        self._reacted_at = time.monotonic()
+        self._held = None
+        await self._send(reaction="shocked")
 
     async def _read_words_heard(self, before: list[str], newest: list[str], turn: int):
         heard = len(before) + len(newest)

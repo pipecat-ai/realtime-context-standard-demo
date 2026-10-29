@@ -50,7 +50,7 @@ export interface SpeechTrack {
 const MOUTH = {
   /** Energy below `quiet` closes the mouth; from `loud` it opens fully. */
   quiet: 0.2,
-  loud: 0.8,
+  loud: 0.7,
   /** The analyzer's openness, as vowel height: `low` is a close vowel, `high` an open one. */
   low: 0.15,
   high: 0.8,
@@ -58,16 +58,19 @@ const MOUTH = {
   heightShare: 0.55,
   /** How much of that height the phones decide, where there are phones. */
   phoneShare: 0.6,
-  /** The rig openness of a loud, open vowel: about two-fifths as tall as the mouth is wide. */
-  maxOpen: 0.5,
-  /** The lips' width at rest, and talking between vowels: drawn in and a little pursed. */
+  /** The rig openness of a loud, open vowel: about half as tall as the mouth is wide. */
+  maxOpen: 0.62,
+  /**
+   * The lips' width at rest, and talking between vowels: drawn in, and rounded
+   * enough to part in an oval rather than a slot the width of her smile.
+   */
   restWidth: 0.47,
-  talkWidth: 0.44,
-  talkRound: 0.2,
+  talkWidth: 0.42,
+  talkRound: 0.35,
   /** Without phones: the analyzer's rounding and width that start and complete a shape. */
   roundFrom: 0.45,
   roundTo: 0.9,
-  maxRound: 0.5,
+  maxRound: 0.75,
   spreadFrom: 0.5,
   spreadTo: 0.95,
   maxWidth: 0.6,
@@ -121,37 +124,40 @@ const consonant = (
 })
 
 /**
- * ARPAbet without stress. Rounding draws the corners in and lifts the upper
- * lip, so the open vowels keep some: an oval rather than a slot. Consonants
- * weigh little: they take the lips of the vowels around them.
+ * ARPAbet without stress, set by eye against the rig: below a rounding of
+ * about 0.3 an open mouth is a flat slot of teeth; around 0.4 it's an oval;
+ * from 0.7 the corners draw in to an "O". So the open vowels part in an oval,
+ * the back vowels round to an "O", taller for "oh" and smaller for "oo", and
+ * only the front vowels "ee", "ay" and "ih" spread. Consonants weigh little: they take the lips of
+ * the vowels around them, except those that shape the lips themselves.
  */
 const VISEMES: Record<string, Viseme> = {
-  AA: vowel(1, 0.44, 0.24),
-  AH: vowel(0.8, 0.43, 0.26),
-  AE: vowel(0.9, 0.47, 0.2),
-  AW: vowel(0.95, 0.42, 0.3),
-  AY: vowel(0.95, 0.46, 0.22),
-  AO: vowel(0.85, 0.41, 0.36),
-  EH: vowel(0.75, 0.47, 0.18),
-  EY: vowel(0.6, 0.52, 0.14),
-  IH: vowel(0.5, 0.52, 0.14),
-  IY: vowel(0.35, 0.62, 0.06),
-  ER: vowel(0.45, 0.42, 0.32),
-  OW: vowel(0.7, 0.4, 0.44),
-  OY: vowel(0.75, 0.41, 0.38),
-  UH: vowel(0.5, 0.4, 0.42),
-  UW: vowel(0.4, 0.38, 0.54),
-  W: consonant(0.25, 0.36, 0.6, 1),
-  R: consonant(0.35, 0.42, 0.34, 0.6),
-  Y: consonant(0.3, 0.54, 0.1, 0.6),
-  F: consonant(0.12, 0.48, 0.1, 0.8),
-  V: consonant(0.12, 0.48, 0.1, 0.8),
-  SH: consonant(0.3, 0.4, 0.42, 0.7),
-  ZH: consonant(0.3, 0.4, 0.42, 0.7),
-  CH: consonant(0.3, 0.4, 0.42, 0.7),
-  JH: consonant(0.3, 0.4, 0.42, 0.7),
-  S: consonant(0.2, 0.5, 0.1),
-  Z: consonant(0.2, 0.5, 0.1),
+  AA: vowel(1, 0.44, 0.42),
+  AH: vowel(0.8, 0.43, 0.45),
+  AE: vowel(0.9, 0.46, 0.34),
+  AW: vowel(0.95, 0.41, 0.58),
+  AY: vowel(0.95, 0.45, 0.38),
+  AO: vowel(0.9, 0.4, 0.7),
+  EH: vowel(0.75, 0.46, 0.3),
+  EY: vowel(0.6, 0.5, 0.26),
+  IH: vowel(0.5, 0.5, 0.28),
+  IY: vowel(0.35, 0.56, 0.16),
+  ER: vowel(0.5, 0.4, 0.58),
+  OW: vowel(0.85, 0.38, 0.84),
+  OY: vowel(0.8, 0.39, 0.72),
+  UH: vowel(0.55, 0.39, 0.74),
+  UW: vowel(0.45, 0.36, 0.92),
+  W: consonant(0.25, 0.34, 0.95, 1),
+  R: consonant(0.35, 0.4, 0.58, 0.6),
+  Y: consonant(0.3, 0.5, 0.24, 0.6),
+  F: consonant(0.12, 0.46, 0.26, 0.8),
+  V: consonant(0.12, 0.46, 0.26, 0.8),
+  SH: consonant(0.3, 0.38, 0.72, 0.7),
+  ZH: consonant(0.3, 0.38, 0.72, 0.7),
+  CH: consonant(0.3, 0.38, 0.72, 0.7),
+  JH: consonant(0.3, 0.38, 0.72, 0.7),
+  S: consonant(0.2, 0.47, 0.26),
+  Z: consonant(0.2, 0.47, 0.26),
   P: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),
   B: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),
   M: consonant(0, MOUTH.talkWidth, MOUTH.talkRound, 0.5),

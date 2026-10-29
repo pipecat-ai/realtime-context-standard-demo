@@ -7,11 +7,11 @@
 """Demo mode: a scripted caller talks to Sam, so the demo runs with no one at the mic.
 
 The caller's lines walk through a typical support call that runs the range of
-feelings, from nervous to sarcastic, angry, apologetic, surprised and glad, so
+feelings, from relieved to sarcastic, angry, sad, surprised and amused, so
 the Tone reader, the LLM's replies and the tagger's delivery all have something
 to show, along with a tool call for each order. While Sam reads out an order,
-the caller now and then says "mm-hmm", which the backchannel detector keeps from
-interrupting. ElevenLabs v4 voices each line, performed with its tags, in a male
+the caller now and then backchannels, "uh-huh" or "right", which the
+backchannel detector keeps from interrupting. ElevenLabs v4 voices each line, performed with its tags, in a male
 voice.
 
 ``DemoCaller`` goes right after the transport's input, in place of the mic, and
@@ -46,6 +46,7 @@ from pipecat.frames.frames import (
     InterruptionFrame,
     LLMFullResponseEndFrame,
     LLMFullResponseStartFrame,
+    LLMTextFrame,
     StartFrame,
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
@@ -67,10 +68,15 @@ MESSAGE_SECS = 0.1
 REPLY_TIMEOUT_SECS = 20.0
 # How many lines ElevenLabs voices at once.
 RENDERS_AT_ONCE = 3
+# A backchannel needs this long of Sam's answer still to come, judged by its
+# length at about CHARS_PER_SEC, or it lands as she stops and takes the floor.
+BACKCHANNEL_ROOM_SECS = 1.5
+CHARS_PER_SEC = 15.0
 # A pause in a line longer than MAX_PAUSE_SECS is cut to it: ElevenLabs can
-# leave a long one between sentences, which Flux would end the turn at. Quieter
+# leave a long one between sentences, which Flux would end the turn at. Shorter
+# ones stay, for the avatar listener's nods (avatar/listener.py's PAUSE_SECS). Quieter
 # than SILENCE_DB, in dB of full scale, is a pause.
-MAX_PAUSE_SECS = 0.15
+MAX_PAUSE_SECS = 0.22
 SILENCE_DB = -45.0
 
 
@@ -98,8 +104,9 @@ SCRIPT = [
     Line(
         "Hi, yeah, I'm calling about a tent I ordered, order four eight two one three, can "
         "you tell me where it is?",
-        # Flux can leave a hummed "mm-hmm" untranscribed, with nothing to show.
-        backchannel="Okay, yeah.",
+        # Flux can leave a hummed "mm-hmm" untranscribed, with nothing to show,
+        # and the backchannel model can take "okay, yeah" for the floor.
+        backchannel="Uh-huh.",
     ),
     Line(
         "[relieved] Oh, thank goodness, I was honestly so worried it wouldn't make it, we "
@@ -136,9 +143,10 @@ SCRIPT = [
     ),
     Line("[hopeful] Oh, good, I really need it by Friday, so could you speed it up?"),
     Line("[surprised] No way, only fifteen dollars, wow, yes, absolutely, do it!", pause=0.9),
+    # A joke, for Sam to laugh along with.
     Line(
-        "[laughs] That's amazing, you might have actually just saved this trip, is there "
-        "anything else I need to do?",
+        "[laughing] Ha, perfect, because my backup plan was sleeping in the car with my dog "
+        "and a bag of marshmallows!",
         pause=1.1,
     ),
     Line("[warmly] Perfect, thanks, Sam, seriously, you've been great, that's everything."),
@@ -194,6 +202,9 @@ class _ReplyWatcher(FrameProcessor):
         await super().process_frame(frame, direction)
         if isinstance(frame, LLMFullResponseStartFrame):
             self._caller._sam_writing = True
+            self._caller._reply_chars = 0
+        elif isinstance(frame, LLMTextFrame):
+            self._caller._reply_chars += len(frame.text)
         elif isinstance(frame, (LLMFullResponseEndFrame, InterruptionFrame)):
             self._caller._sam_writing = False
             self._caller._sam_quiet_at = time.monotonic()
@@ -222,6 +233,8 @@ class DemoCaller(FrameProcessor):
         self._sam_answered = False
         self._sam_answered_at = 0.0
         self._sam_quiet_at = 0.0
+        # How long the reply being written is so far, in characters.
+        self._reply_chars = 0
         self._calls: set[str] = set()
         self.replies = _ReplyWatcher(self)
 
@@ -311,14 +324,16 @@ class DemoCaller(FrameProcessor):
         logger.warning("Demo caller: no reply from Sam, so saying the next line")
 
     async def _sam_still_answering(self, after: float) -> bool:
-        """Waits for Sam to have been answering for ``after`` seconds.
+        """Waits for Sam to have been answering for ``after`` seconds, with more to say.
 
-        False if the answer ends first, or never starts.
+        False if the answer ends first, or never starts, or is too short for one.
         """
         started = time.monotonic()
         while time.monotonic() - started < REPLY_TIMEOUT_SECS:
             if self._sam_answered:
-                if self._sam_speaking and time.monotonic() - self._sam_answered_at >= after:
+                spoken = time.monotonic() - self._sam_answered_at
+                left = self._reply_chars / CHARS_PER_SEC - spoken
+                if self._sam_speaking and spoken >= after and left >= BACKCHANNEL_ROOM_SECS:
                     return True
                 if not self._sam_busy and time.monotonic() - self._sam_quiet_at >= 0.5:
                     return False
