@@ -12,15 +12,23 @@ dependencies = [
 [dependency-groups]
 dev = ["pipecat-ai[cli]", "pyright>=1.1.404,<2", "ruff>=0.12.11,<1"]
 
-# Pipecat Tone's rc1 models (pipecat-ai/pipecat#6407) and the reader's perception on
-# RTVI user-input (#6418) are on main but not yet released. Drop this source and pin
-# a release once they ship.
+# Pipecat Tone's rc1 models and the reader's perception on RTVI user-input are on
+# main but not yet released; uv.lock pins the commit. Drop this source and pin a
+# release once they ship.
 [tool.uv.sources]
 pipecat-ai = { git = "https://github.com/pipecat-ai/pipecat.git", branch = "main" }
 
 [tool.pyright]
-# Copied from pipecat-visemes as it is, which doesn't type-check it (lipsync/README.md).
-exclude = ["lipsync", ".venv"]
+# Copied as they are from pipecat-visemes and pipecat-vap, which don't type-check them
+# (lipsync/README.md, backchannel/README.md).
+exclude = [
+    "lipsync",
+    "backchannel/analyzer.py",
+    "backchannel/decision.py",
+    "backchannel/lexicon.py",
+    "backchannel/model.py",
+    ".venv",
+]
 
 [tool.ruff]
 line-length = 100

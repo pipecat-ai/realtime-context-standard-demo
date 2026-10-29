@@ -3057,8 +3057,8 @@ wheels = [
 
 [[package]]
 name = "pipecat-ai"
-version = "1.14.1.dev177"
-source = { git = "https://github.com/pipecat-ai/pipecat.git?branch=main#cf2e0f8d55afd0f30c2b4c311cc010de96461e04" }
+version = "1.14.1.dev295"
+source = { git = "https://github.com/pipecat-ai/pipecat.git?branch=main#2529106e312f892145511e22c344f336fc11824d" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },

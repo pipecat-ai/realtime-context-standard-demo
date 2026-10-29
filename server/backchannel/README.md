@@ -20,9 +20,9 @@ again to update. `model.py` pins the model's revision and checksum.
 ## Model download
 
 The first session with `detect_backchannels` downloads the model (4 MB) to
-`~/.cache/pipecat-backchannel`. The Hugging Face repo is private for now, so
-that needs `HF_TOKEN` in `server/.env`, or a `hf auth login`, with read access
-to `pipecat-ai`. `BACKCHANNEL_MODEL` can point at a local `.onnx` instead.
+`~/.cache/pipecat-backchannel`. The Hugging Face repo is public, so it needs no
+token; `HF_TOKEN` is used if set. `BACKCHANNEL_MODEL` can point at a local
+`.onnx` instead.
 
 ## Removing it
 

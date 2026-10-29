@@ -78,11 +78,9 @@ Set at session start, in the `/start` request's `body`:
 
 The Tone reader runs either way.
 
-Pipecat Tone's rc1 models come from
-[pipecat-ai/pipecat#6407](https://github.com/pipecat-ai/pipecat/pull/6407), and
-[pipecat-ai/pipecat#6418](https://github.com/pipecat-ai/pipecat/pull/6418) sends the
-reader's perception to the client in RTVI `user-input`. Both are merged but not yet
-released, so `server/pyproject.toml` installs Pipecat from `main` until they are.
+Pipecat Tone's rc1 models, and the reader's perception in RTVI `user-input`, are on
+Pipecat's `main` but not yet released, so `server/pyproject.toml` installs Pipecat
+from `main` (`uv.lock` pins the commit) until they are.
 
 ### Run locally
 
@@ -93,8 +91,9 @@ uv sync
 uv run bot.py
 ```
 
-Open http://localhost:7860/client. The first session downloads the Tone models from
-Hugging Face before the pipeline starts.
+Open http://localhost:7860/client. The first session downloads the Tone models and
+the backchannel model from Hugging Face before the pipeline starts. Their repos are
+public, so no token is needed.
 
 Server env, in `server/.env` (from `server/env.example`):
 
@@ -108,7 +107,7 @@ Server env, in `server/.env` (from `server/env.example`):
 | `ELEVENLABS_VOICE_ID`   | `tts` elevenlabs, optional: defaults to River          |
 | `CARTESIA_API_KEY`      | `tts` cartesia                                         |
 | `CARTESIA_VOICE_ID`     | `tts` cartesia, optional: defaults to an Emotive voice |
-| `HF_TOKEN`              | Optional: Hugging Face downloads. `detect_backchannels` (on by default): read access to `pipecat-ai`, whose model is private for now, unless `hf auth login` has it |
+| `HF_TOKEN`              | Optional: the models are public; a token only raises Hugging Face's rate limits |
 | `TYPESAFE_API_KEY`      | Optional: Jev, for the avatar's expressions and gestures |
 
 ### Evals
