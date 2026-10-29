@@ -26,7 +26,8 @@ to `pipecat-ai`. `BACKCHANNEL_MODEL` can point at a local `.onnx` instead.
 
 ## Removing it
 
-The feature is off unless a session asks for it. To take it out:
+The feature is on unless a session turns it off (`detect_backchannels: "false"`).
+To take it out:
 
 - delete `server/backchannel/`;
 - `server/bot.py`: `BotOptions.detect_backchannels` and where it's read, and

@@ -25,8 +25,8 @@ Three start-time options, read from the ``/start`` request body, swap parts:
 - ``tts``: ``"elevenlabs"`` (default) or ``"cartesia"``.
 - ``use_tagger``: ``"true"`` (default) or ``"false"``, which drops the tagger
   and has GPT-5.6 Luna write the expression tags itself.
-- ``detect_backchannels``: ``"false"`` (default) or ``"true"``, which keeps Sam
-  talking through the user's backchannels (``backchannel/``).
+- ``detect_backchannels``: ``"true"`` (default), which keeps Sam talking
+  through the user's backchannels (``backchannel/``), or ``"false"``.
 
 Run the bot using::
 
@@ -129,8 +129,9 @@ class BotOptions:
     # False: GPT-5.6 Luna writes the tags itself.
     use_tagger: bool = True
     # True: the backchannel model hears whether speech over Sam is a backchannel
-    # ("mm-hmm"), which leaves Sam talking, or an interruption.
-    detect_backchannels: bool = False
+    # ("mm-hmm"), which leaves Sam talking, or an interruption. False: all of it
+    # interrupts her.
+    detect_backchannels: bool = True
 
     @classmethod
     def from_body(cls, body: Any) -> "BotOptions":

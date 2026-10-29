@@ -53,7 +53,7 @@ Set at session start, in the `/start` request's `body`:
 | --------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `tts`                 | `"elevenlabs"` (default), `"cartesia"` | ElevenLabs v4 Text-to-Dialogue, or Cartesia. Breaths only with ElevenLabs.                                                  |
 | `use_tagger`          | `"true"` (default), `"false"`          | `"false"` drops the tagger and swaps PhoneLLM Mini for GPT-5.6 Luna, which writes the tags itself from the TTS's tag spec. |
-| `detect_backchannels` | `"false"` (default), `"true"`          | `"true"` keeps Sam talking through the user's backchannels ("mm-hmm"), which the transcript shows in grey. See `server/backchannel/`. |
+| `detect_backchannels` | `"true"` (default), `"false"`          | `"true"` keeps Sam talking through the user's backchannels ("mm-hmm"), which the transcript shows in grey; `"false"` lets them interrupt her. See `server/backchannel/`. |
 
 The Tone reader runs either way.
 
@@ -87,7 +87,7 @@ Server env, in `server/.env` (from `server/env.example`):
 | `ELEVENLABS_VOICE_ID`   | `tts` elevenlabs, optional: defaults to River          |
 | `CARTESIA_API_KEY`      | `tts` cartesia                                         |
 | `CARTESIA_VOICE_ID`     | `tts` cartesia, optional: defaults to an Emotive voice |
-| `HF_TOKEN`              | Optional: Hugging Face downloads. `detect_backchannels` true: read access to `pipecat-ai`, whose model is private for now, unless `hf auth login` has it |
+| `HF_TOKEN`              | Optional: Hugging Face downloads. `detect_backchannels` (on by default): read access to `pipecat-ai`, whose model is private for now, unless `hf auth login` has it |
 | `TYPESAFE_API_KEY`      | Optional: Jev, for the avatar's expressions and gestures |
 
 ### Evals

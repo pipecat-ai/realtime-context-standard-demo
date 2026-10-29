@@ -15,7 +15,7 @@ interface SessionState {
 export const useSessionStore = create<SessionState>()((set) => ({
   tts: "elevenlabs",
   useTagger: true,
-  detectBackchannels: false,
+  detectBackchannels: true,
   setTts: (tts) => set({ tts }),
   setUseTagger: (useTagger) => set({ useTagger }),
   setDetectBackchannels: (detectBackchannels) => set({ detectBackchannels }),
