@@ -15,7 +15,8 @@ import type {
  * every control is smoothed around the moment shown, which the batches and
  * phones arrive far enough ahead of to allow. While she talks, her lips draw
  * in from their rest and purse a little, so she talks with a mouth, not a
- * flap the width of her smile.
+ * flap the width of her smile; and they keep that shape where they meet within
+ * a phrase, so her smile only comes back in a pause.
  */
 
 /** One analyzer keyframe: seconds into its utterance, and the wire's 0–1 controls. */
@@ -165,7 +166,18 @@ const VISEMES: Record<string, Viseme> = {
 const OTHER_CONSONANT = consonant(0.35)
 const BILABIALS = new Set(["P", "B", "M"])
 
-const REST: Articulation = { openness: 0, width: 0.5, rounding: 0, energy: 0 }
+/** The mouth in rig units, and how far she is talking (talkAt), which the runtime holds the lips' speaking shape on. */
+interface ShapedMouth extends Articulation {
+  talking: number
+}
+
+const REST: ShapedMouth = {
+  openness: 0,
+  width: 0.5,
+  rounding: 0,
+  energy: 0,
+  talking: 0,
+}
 
 const clamp = (value: number, low = 0, high = 1) =>
   Math.min(high, Math.max(low, value))
@@ -360,7 +372,7 @@ function shapeMouth(
   track: SpeechTrack,
   offset: number,
   p: MouthParams = MOUTH
-): Articulation {
+): ShapedMouth {
   const phoned = track.phones.length > 0
   const openAt = (t: number) => {
     const k = keyframeAt(track.keyframes, t)
@@ -407,6 +419,7 @@ function shapeMouth(
     width: p.restWidth + (shaped - p.restWidth) * talk,
     rounding: (weights > 0 ? rounding / weights : 0) * talk,
     energy: keyframeAt(track.keyframes, offset).energy,
+    talking: talk,
   }
 }
 
@@ -417,7 +430,7 @@ function shapeMouth(
  * lag.
  */
 class MouthFollower {
-  private mouth: Articulation = { ...REST }
+  private mouth: ShapedMouth = { ...REST }
   private at: number | null = null
   private readonly p: MouthParams
 
@@ -430,7 +443,7 @@ class MouthFollower {
     offset: number | null,
     speaking: boolean,
     nowMs: number
-  ): Articulation {
+  ): ShapedMouth {
     const target =
       speaking && offset !== null
         ? shapeMouth(track, offset + this.p.follow, this.p)
@@ -445,6 +458,7 @@ class MouthFollower {
       width: follow(this.mouth.width, target.width),
       rounding: follow(this.mouth.rounding, target.rounding),
       energy: target.energy,
+      talking: follow(this.mouth.talking, target.talking),
     }
     return { ...this.mouth }
   }
@@ -490,9 +504,10 @@ export function shapedSource(
  * The speech sample that the runtime's mapSpeechToRig turns into `mouth`
  * exactly: its rounding and width maps inverted, and the openness its
  * calibration needs found by bisection. Marked as no keyframe, with no events,
- * so the runtime neither damps it again nor snaps it shut.
+ * so the runtime neither damps it again nor snaps it shut, and with how far
+ * she's talking, which the runtime's lips hold their speaking shape on.
  */
-function sampleFor(mouth: Articulation, base: SpeechSample): SpeechSample {
+function sampleFor(mouth: ShapedMouth, base: SpeechSample): SpeechSample {
   const width = clamp(mouth.width)
   const wireWidth = width <= 0.5 ? width * 0.7 : 0.35 + (width - 0.5) * 1.3
   const wireRounding = 0.35 + 0.65 * clamp(mouth.rounding)
@@ -510,6 +525,7 @@ function sampleFor(mouth: Articulation, base: SpeechSample): SpeechSample {
     width: wireWidth,
     rounding: wireRounding,
     energy: clamp(mouth.energy),
+    talking: clamp(mouth.talking),
     live: false,
     sealed: false,
     release: undefined,

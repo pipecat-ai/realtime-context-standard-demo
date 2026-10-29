@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Copies a Pipecat Character Studio export into the client: its data files to
 # public/avatar/, served at /avatar/, and its runtime to src/avatar-runtime/,
-# with this demo's addition applied (avatar-runtime.patch: speech that moves
-# the head, brows and eyes). Re-run with a newer export of the character to
-# update both.
+# with this demo's additions applied (avatar-runtime.patch: speech that moves
+# the head, brows and eyes, and lips that carry their corners whole as they
+# open and hold their speaking shape through a phrase). Re-run with a newer
+# export of the character to update both.
 #
 #   scripts/use-avatar.sh ~/Sites/pipecat-character-studio/out/exports/pipecat-momo-20261028-215559
 set -euo pipefail

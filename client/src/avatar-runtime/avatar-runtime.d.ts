@@ -67,6 +67,12 @@ export interface SpeechSample {
    * as speaking does, while listening.
    */
   gesture?: { pose?: Partial<Pose>; relax?: number; attend?: boolean };
+  /**
+   * realtime-context-standard-demo: how far the speech is talking (0–1), over its syllables rather than each one. The
+   * lips keep that much of their speaking shape when they close, so they meet within a phrase without springing their
+   * corners back to rest.
+   */
+  talking?: number;
 }
 
 /** Where a player's speech comes from. `sample` never returns null: with nothing to say it reports rest, not speaking. */
