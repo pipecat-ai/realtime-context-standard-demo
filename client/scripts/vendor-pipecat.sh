@@ -3,7 +3,7 @@
 # into vendor/, for the unreleased RTVI 2.3.0 standard. Re-run with a newer
 # commit, then point package.json at the new tarballs and `pnpm install`.
 #
-#   scripts/vendor-pipecat.sh 67ddd9d
+#   scripts/vendor-pipecat.sh 68428ba
 set -euo pipefail
 
 commit="${1:?usage: $0 <pipecat-client-web commit>}"
