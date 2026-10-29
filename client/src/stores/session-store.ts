@@ -7,7 +7,7 @@ export type TtsChoice = "elevenlabs" | "cartesia"
  * words and the Tone tagger voices them for ElevenLabs, or GPT-5.6 Luna
  * writes the tags itself, for Cartesia.
  */
-export const MODES = {
+const MODES = {
   tagger: { tts: "elevenlabs", useTagger: true },
   llm: { tts: "cartesia", useTagger: false },
 } as const satisfies Record<string, { tts: TtsChoice; useTagger: boolean }>

@@ -37,6 +37,19 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* The stage's corners, and the mode dialog's a little rounder around its
+     cards' 3xl. */
+  --radius-stage: 1.75rem;
+  --radius-dialog: 2rem;
+  /* The tagged line and the mode cards' chips: as small as the readout
+     labels. */
+  --text-2xs: 0.625rem;
+  /* White type on the ambient light, lifted off it: the call button's, and
+     the softer mode cards' titles. */
+  --text-shadow-lift: 0 1px 1px oklch(0 0 0 / 0.4);
+  --text-shadow-lift-soft: 0 1px 1px oklch(0 0 0 / 0.3);
+  /* A lit top edge on a pane of glass. */
+  --inset-shadow-glass-edge: inset 0 1px 0 oklch(1 0 0 / 0.25);
   --color-active: var(--active-background);
   --color-active-foreground: var(--active-foreground);
   --color-inactive: var(--inactive-background);
@@ -201,6 +214,15 @@
   --expression-angry: #f7768e;
   --expression-win: #9ece6a;
   --expression-foreground: #0a0a0a;
+  /* The mode dialog's cards, each a still of the stage's ambient light. */
+  --mode-llm:
+    radial-gradient(110% 80% at 88% 8%, #b4f0c8 0%, transparent 55%),
+    radial-gradient(90% 70% at 0% 100%, #06301f 0%, transparent 65%),
+    linear-gradient(160deg, #1d7a50, #2f9e68 45%, #12573a);
+  --mode-tagger:
+    radial-gradient(110% 80% at 88% 8%, #ecbdf0 0%, transparent 55%),
+    radial-gradient(90% 70% at 0% 100%, #3a1260 0%, transparent 65%),
+    linear-gradient(160deg, #7a33b0, #a94cc4 45%, #5a2380);
 }
 
 @layer base {

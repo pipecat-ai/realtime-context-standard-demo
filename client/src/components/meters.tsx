@@ -137,48 +137,8 @@ export function MiniBars({
 }
 
 // ---------------------------------------------------------------------------
-// Stat, SectionLabel
+// SectionLabel
 // ---------------------------------------------------------------------------
-
-export interface StatProps {
-  label: ReactNode
-  /** Null prints an em dash: no value yet. */
-  value: ReactNode | null
-  unit?: string
-  color?: string
-  /** Anything after the value: a MiniBars, a Delta. */
-  aside?: ReactNode
-  align?: "right"
-  className?: string
-}
-
-/** A number with its name: a tracked label over an extrabold tabular value. */
-export function Stat({
-  label,
-  value,
-  unit,
-  color,
-  aside,
-  align,
-  className,
-}: StatProps) {
-  return (
-    <div
-      className={cn(
-        "readout-stat",
-        align === "right" && "items-end text-right",
-        className
-      )}
-    >
-      <span className="readout-label">{label}</span>
-      <span className="readout-stat-val" style={{ color }}>
-        {value ?? "—"}
-        {unit && <small>{unit}</small>}
-        {aside}
-      </span>
-    </div>
-  )
-}
 
 /** A group's header row: its name on the left, its scale or unit on the right. */
 export function SectionLabel({

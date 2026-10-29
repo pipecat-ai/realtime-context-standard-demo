@@ -36,7 +36,6 @@ function Stage({ track, onStart }: StageProps) {
   element (cards, chips).
 - `GlassVoiceBars`: voice-band bars that melt together, gather while
   connecting and ripple while thinking.
-- `PalettePicker`: swatches for `AMBIENT_PALETTES`.
 - Looks: `FIGMA_GLASS` (shared optics), `PANE_LOOK`, `PANE_FROST`,
   `BARS_LOOK` in `optics.ts`; bar shape in `bars.ts`.
 
@@ -46,7 +45,6 @@ Copy this folder and add `@import "./glass/glass-button.css";` to the app's
 CSS. It expects a React 19 + Tailwind v4 + shadcn app with:
 
 - `@/lib/utils` (`cn`)
-- `motion` (the palette picker)
 - from the Pipecat UI registry: `@/lib/visualizer` and
   `@/components/pipecat/audio-visualizer-bar` (the bars' analyser and
   fallback)

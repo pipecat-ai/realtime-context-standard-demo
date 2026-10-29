@@ -129,7 +129,9 @@ export function startAmbient(
       optics = inputs.optics
       dirty = true
     }
-    if (!renderer || !visible || canvas.width < 2) return
+    // Not until the canvas is measured: before then it's the default 300×150,
+    // and the scene's framebuffer has nothing attached.
+    if (!renderer || !visible || width === 0 || canvas.width < 2) return
 
     const barsSource = scene.bars
     const barsState =

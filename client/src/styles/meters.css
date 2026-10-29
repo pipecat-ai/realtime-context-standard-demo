@@ -15,13 +15,6 @@
   text-transform: uppercase;
   color: var(--muted-foreground);
 }
-.readout-axis {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  line-height: 1;
-  color: var(--faint);
-  font-variant-numeric: tabular-nums;
-}
 
 .readout-seg {
   display: inline-flex;
@@ -50,32 +43,6 @@
 .readout-minibars > i {
   display: block;
   width: 3px;
-}
-
-.readout-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.readout-stat-val {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 18px;
-  line-height: 1;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-.readout-stat-val small {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-}
-.readout-stat-val > :not(small) {
-  align-self: center;
 }
 
 .readout-section-label {

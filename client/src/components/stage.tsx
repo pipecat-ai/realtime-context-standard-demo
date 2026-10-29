@@ -60,7 +60,7 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
     <section
       aria-label="Voice agent"
       className={cn(
-        "on-ambient flex h-[40dvh] min-h-64 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1",
+        "on-ambient flex h-[40dvh] min-h-64 flex-col overflow-hidden rounded-stage bg-card lg:h-auto lg:min-h-0 lg:flex-1",
         className
       )}
     >

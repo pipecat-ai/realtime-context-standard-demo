@@ -1,3 +1,5 @@
+import { LogLevel } from "@pipecat-ai/client-js"
+
 import type { UsePipecatAppOptions } from "@/hooks/use-pipecat-app"
 import { isDemo } from "@/lib/demo"
 import { lipsync } from "@/stores/avatar-store"
@@ -39,5 +41,10 @@ export function sessionOptions(): UsePipecatAppOptions {
     },
     clientOptions: { callbacks: lipsync.callbacks, enableMic: !isDemo },
     initDevicesOnMount: !isDemo,
+    // The SDK logs every message at debug, transcripts and all; in
+    // production, only what went wrong.
+    onClient: (client) => {
+      if (import.meta.env.PROD) client.setLogLevel(LogLevel.WARN)
+    },
   }
 }

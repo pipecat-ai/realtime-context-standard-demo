@@ -1,6 +1,7 @@
-import { RTVIEvent } from "@pipecat-ai/client-js"
+import { RTVIEvent, type RTVIMessage } from "@pipecat-ai/client-js"
 import {
   PipecatClientProvider,
+  usePipecatClient,
   usePipecatClientTransportState,
   useRTVIClientEvent,
 } from "@pipecat-ai/client-react"
@@ -26,6 +27,9 @@ import { useSessionStore, type Mode } from "@/stores/session-store"
  */
 const SIDE_PANEL = "flex-1 lg:w-[clamp(26rem,38vw,48rem)] lg:flex-none"
 
+/** Before what a fatal error says, which ended the call. */
+const CALL_ENDED = "call ended"
+
 interface SessionProps {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
@@ -41,11 +45,33 @@ interface SessionProps {
  */
 function Session(props: SessionProps) {
   useExpressionEvents()
-  const { connect } = props
+  const { connect, disconnect, error } = props
+  const client = usePipecatClient()
   const transportState = usePipecatClientTransportState()
   const setMode = useSessionStore((state) => state.setMode)
   // Outside a demo, the call's mode is picked on landing.
   const [choosing, setChoosing] = useState(!isDemo)
+  // A fatal error from the bot or transport mid-call, which the client
+  // answers by hanging up. A failed start is the hook's own error, and it
+  // drops one the user cancelled, so only a call that's up is read here.
+  const [callError, setCallError] = useState<string | null>(null)
+
+  useRTVIClientEvent(RTVIEvent.Error, (message: RTVIMessage) => {
+    const data = message.data as {
+      error?: string
+      message?: string
+      fatal?: boolean
+    }
+    const up = client?.state === "connected" || client?.state === "ready"
+    if (!data.fatal || !up) return
+    const reason = data.error ?? data.message
+    setCallError(reason ? `${CALL_ENDED}: ${reason}` : CALL_ENDED)
+  })
+
+  const start = () => {
+    setCallError(null)
+    return connect()
+  }
 
   const pick = (mode: Mode) => {
     setMode(mode)
@@ -54,7 +80,7 @@ function Session(props: SessionProps) {
     // on the mic, and then the call button starts the call.
     if (transportState !== "initialized") return
     lipsync.resume()
-    void connect()
+    void start()
   }
 
   // A demo starts itself where the browser lets it play without a tap.
@@ -67,7 +93,12 @@ function Session(props: SessionProps) {
   return (
     <div className="flex h-dvh flex-col lg:flex-row">
       <div className="flex min-w-0 shrink-0 flex-col gap-3 pb-3 sm:p-4 lg:min-h-0 lg:flex-1">
-        <Stage {...props} className="max-sm:rounded-none lg:flex-1" />
+        <Stage
+          connect={start}
+          disconnect={disconnect}
+          error={error ?? callError}
+          className="max-sm:rounded-none lg:flex-1"
+        />
         {/* The timeline keeps room above its lanes for backchannel labels,
             which on phones is gap enough, so it takes back the column's. */}
         <Timeline className="shrink-0 max-sm:-mt-3 max-sm:px-3" />

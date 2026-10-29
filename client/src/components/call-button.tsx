@@ -64,14 +64,14 @@ export function CallButton({
       <PhoneIcon
         className={cn(
           "size-5 fill-current text-active",
-          connecting && "animate-pulse"
+          connecting && "motion-safe:animate-pulse"
         )}
         aria-hidden
       />
-      <span className="ml-2.5 text-xl leading-none font-medium tracking-tight text-shadow-[0_1px_1px_oklch(0_0_0/0.4)]">
+      <span className="ml-2.5 text-xl leading-none font-medium tracking-tight text-shadow-lift">
         {connectable ? "Start" : "End"}
       </span>
-      <span className="ml-3 text-sm leading-none font-medium text-white/85 tabular-nums">
+      <span className="ml-3 text-sm leading-none font-medium text-foreground/85 tabular-nums">
         {!connectable && !connecting ? (
           <CallTimer />
         ) : connecting ? (
@@ -80,16 +80,16 @@ export function CallButton({
           "00:00"
         )}
       </span>
-      <span className="ml-3.5 h-6 w-px bg-white/35" aria-hidden />
+      <span className="ml-3.5 h-6 w-px bg-foreground/35" aria-hidden />
       <span
         data-glass-frost
-        className="ml-3.5 flex size-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/90"
+        className="ml-3.5 flex size-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-foreground/90"
         aria-hidden
       >
         {connectable ? (
           <PlayIcon className="ml-0.5 size-3 fill-current" />
         ) : (
-          <span className="size-2.5 rounded-[2px] bg-white" />
+          <span className="size-2.5 rounded-xs bg-foreground" />
         )}
       </span>
     </GlassButton>

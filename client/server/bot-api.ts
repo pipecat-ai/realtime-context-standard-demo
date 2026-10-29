@@ -121,7 +121,16 @@ async function startSession(
   if (!response.ok) return response
 
   // Pass on only what each transport reads; daily-js warns on extra fields.
-  const started = (await response.json()) as StartResponse
+  const started = (await response
+    .json()
+    .catch(() => null)) as StartResponse | null
+  if (!started) {
+    console.error(`[bot-api] ${config.startUrl} answered with no JSON`)
+    return Response.json(
+      { info: "The bot sent an unreadable response" },
+      { status: 502 }
+    )
+  }
   return Response.json(
     config.transport === "daily"
       ? { dailyRoom: started.dailyRoom, dailyToken: started.dailyToken }
@@ -149,11 +158,9 @@ async function forward(
   try {
     response = await fetch(url, { ...init, headers })
   } catch (error) {
+    // The log names the bot; the browser isn't told where it runs.
     console.error(`[bot-api] could not reach ${url}:`, error)
-    return Response.json(
-      { info: `Could not reach the bot at ${new URL(url).origin}` },
-      { status: 502 }
-    )
+    return Response.json({ info: "Could not reach the bot" }, { status: 502 })
   }
 
   if (!response.ok) {

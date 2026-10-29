@@ -65,12 +65,12 @@ export function TaggedLine({ parts }: { parts: ConversationMessagePart[] }) {
   const tokens = taggedTokens(parts, segments)
   if (!tokens.length) return null
   if (!hasTags(tokens)) {
-    return <p className="font-mono text-[10px] text-faint">{NO_TAGS}</p>
+    return <p className="font-mono text-2xs text-faint">{NO_TAGS}</p>
   }
 
   return (
     // No ligatures: Azeret Mono would draw the tags' << as one chevron.
-    <p className="font-mono text-[10px] leading-relaxed text-muted-foreground [font-variant-ligatures:none]">
+    <p className="font-mono text-2xs leading-relaxed text-muted-foreground [font-variant-ligatures:none]">
       {tokens.map((token, i) => (
         // eslint-disable-next-line @eslint-react/no-array-index-key -- rebuilt in order, never reordered
         <Token key={i} token={token} />
