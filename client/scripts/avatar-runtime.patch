@@ -1,5 +1,5 @@
 diff --git a/client/src/avatar-runtime/avatar-runtime.d.ts b/client/src/avatar-runtime/avatar-runtime.d.ts
-index 6b3e1c9..24796e5 100644
+index 6b3e1c9..96f1b1f 100644
 --- a/client/src/avatar-runtime/avatar-runtime.d.ts
 +++ b/client/src/avatar-runtime/avatar-runtime.d.ts
 @@ -60,6 +60,13 @@ export interface SpeechSample {
@@ -16,8 +16,17 @@ index 6b3e1c9..24796e5 100644
  }
  
  /** Where a player's speech comes from. `sample` never returns null: with nothing to say it reports rest, not speaking. */
+@@ -481,6 +488,8 @@ export interface AvatarPlayer {
+   /** Play a reaction over the expression, as frames are drawn (start(), or tick()). Resolves when it ends, when another
+    * replaces it, or when the player stops; rejects, playing nothing, for an id `reactions` lacks. */
+   react(id: string): Promise<void>;
++  /** realtime-context-standard-demo: ease the reaction under way out, over a quarter second; its react() resolves. */
++  endReaction(): void;
+   /** What the last frame drew (the pose and the reaction under way), or null before the first. */
+   readonly frame: PlayerFrame | null;
+ }
 diff --git a/client/src/avatar-runtime/avatar-runtime.js b/client/src/avatar-runtime/avatar-runtime.js
-index 31e5d79..1ac73dc 100644
+index 31e5d79..317c00e 100644
 --- a/client/src/avatar-runtime/avatar-runtime.js
 +++ b/client/src/avatar-runtime/avatar-runtime.js
 @@ -2635,6 +2635,20 @@ var sanitize = (a) => ({
@@ -69,3 +78,15 @@ index 31e5d79..1ac73dc 100644
    }
    /**
     * The kept frame's effects (docs/animate.md "Effects"), about the eyes' midpoint at actingScale × EFFECT_SCALE px an
+@@ -4137,6 +4152,11 @@ function playerOf(svg, rig, face, options = {}, onDestroy) {
+         pending = resolve;
+       });
+     },
++    // realtime-context-standard-demo: with no reaction asked for, the one under way eases out (REACTION_CANCEL_SECONDS).
++    endReaction() {
++      reaction = null;
++      settle();
++    },
+     get frame() {
+       const kept = animator.frame;
+       if (!kept) return null;

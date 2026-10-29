@@ -4152,6 +4152,11 @@ function playerOf(svg, rig, face, options = {}, onDestroy) {
         pending = resolve;
       });
     },
+    // realtime-context-standard-demo: with no reaction asked for, the one under way eases out (REACTION_CANCEL_SECONDS).
+    endReaction() {
+      reaction = null;
+      settle();
+    },
     get frame() {
       const kept = animator.frame;
       if (!kept) return null;

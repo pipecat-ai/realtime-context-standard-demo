@@ -63,6 +63,8 @@ interface AvatarCueState {
   cues: Record<number, AvatarCue>
   /** Segments that have started playing, and whether each has finished. */
   started: Record<number, "playing" | "done">
+  /** The last reaction to the user, which ends as Sam answers. */
+  heard: string | null
   serverMessage: (data: unknown) => void
   botOutput: (data: BotOutputData) => void
   /** Sam listens from the start of the user's turn until she answers. */
@@ -74,9 +76,11 @@ interface AvatarCueState {
 export const useAvatarCueStore = create<AvatarCueState>()((set, get) => ({
   cues: {},
   started: {},
+  heard: null,
   serverMessage: (data) => {
     if (isListenCue(data)) {
       hear(data)
+      if (data.reaction) set({ heard: data.reaction })
       return
     }
     if (!isCue(data)) return
@@ -109,9 +113,14 @@ export const useAvatarCueStore = create<AvatarCueState>()((set, get) => ({
   },
   botStartedSpeaking: () => {
     listening.listen(false)
+    // A reaction to what the user said is over as Sam answers: her first
+    // line's face would otherwise play under it, wide-eyed and sympathetic.
+    const { reaction, player } = useAvatarStore.getState()
+    if (reaction !== null && reaction === get().heard) player?.endReaction()
+    set({ heard: null })
   },
   reset: () => {
-    set({ cues: {}, started: {} })
+    set({ cues: {}, started: {}, heard: null })
     listening.listen(false)
     play({ expression: LISTENING, reaction: null })
   },

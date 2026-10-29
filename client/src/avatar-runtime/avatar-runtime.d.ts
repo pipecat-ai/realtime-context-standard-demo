@@ -488,6 +488,8 @@ export interface AvatarPlayer {
   /** Play a reaction over the expression, as frames are drawn (start(), or tick()). Resolves when it ends, when another
    * replaces it, or when the player stops; rejects, playing nothing, for an id `reactions` lacks. */
   react(id: string): Promise<void>;
+  /** realtime-context-standard-demo: ease the reaction under way out, over a quarter second; its react() resolves. */
+  endReaction(): void;
   /** What the last frame drew (the pose and the reaction under way), or null before the first. */
   readonly frame: PlayerFrame | null;
 }
