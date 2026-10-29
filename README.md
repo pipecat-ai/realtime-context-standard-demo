@@ -148,9 +148,11 @@ Vite + React, built on the unreleased RTVI 2.3.0 Pipecat clients (vendored in
 avatar on the ambient background; the side panel shows the transcript, tool calls
 and latency.
 
-The avatar is Momo, exported from Pipecat Character Studio into `client/public/avatar/`
-and `client/src/avatar-runtime/`. `client/scripts/use-avatar.sh <export folder>` copies
-in a newer export and applies this demo's patch to its runtime.
+The avatar uses:
+
+- Avatar from Pipecat Character Studio (coming soon!)
+- Lipsync via Pipecat Visemes
+- Expressions, gestures and listening reactions via [Jev](https://docs.typesafe.ai)
 
 Under each user line are the Tone reader's emotion and sarcasm; under
 each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and
