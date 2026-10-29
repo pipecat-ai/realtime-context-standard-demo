@@ -1,6 +1,27 @@
-# Realtime Context Standard Demo
+# Real-time Context Standard Demo
 
-A customer service voice agent for Northwind Outfitters, an outdoor gear shop,
+The [Real-time Context Standard](https://docs.pipecat.ai/api-reference/standards/real-time-context-standard)
+(RCS) is an open standard for the context voice agent models pass each other beyond
+the words. A voice agent is a chain of models: speech-to-text transcribes the user, an
+LLM writes a reply, and text-to-speech speaks it. Between them they pass text, so how
+the user sounded and how the reply should be said are lost along the way. RCS carries
+that context in the same text stream, in formats any model in the chain can produce
+and read.
+
+This demo is a voice agent built on RCS Alpha with Pipecat's
+[expressive conversation](https://docs.pipecat.ai/pipecat/features/expressive-conversation):
+
+- **Perception.** Pipecat Tone's reader hears how each customer turn was meant: their
+  emotion, and whether they're sarcastic. The LLM reads it at the head of their
+  message, such as `([emotion angry=0.81, neutral=0.12],[sarcasm value=0.04]) Where's my order?`.
+- **Expression.** Pipecat Tone's tagger marks up each sentence of the reply with its
+  delivery, sounds, pauses and stressed words, and the TTS performs them:
+  `<<sympathetic>> I'm so sorry about the wait.` With `use_tagger` off, the LLM writes
+  the tags itself.
+- **The client.** Both reach the browser over RTVI 2.3.0: the transcript shows the
+  reading under each customer line, and each bot line as it was voiced.
+
+The agent does customer service for Northwind Outfitters, an outdoor gear shop, and is
 built with [Pipecat](https://pipecat.ai). It looks up orders, changes an order's
 shipping address or speed, cancels orders that haven't shipped, and hangs up when the
 customer is done.
