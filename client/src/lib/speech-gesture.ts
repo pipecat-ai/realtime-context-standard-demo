@@ -1,4 +1,5 @@
-import type { SpeechSource } from "@/avatar-runtime/avatar-runtime.js"
+import type { Pose, SpeechSource } from "@/avatar-runtime/avatar-runtime.js"
+import type { Listening } from "@/lib/listening"
 import { talkAt, type Keyframe, type SpeechTrack } from "@/lib/mouth-shaper"
 
 /**
@@ -347,10 +348,23 @@ class ActingFollower {
   }
 }
 
-/** `source`'s speech with Sam's acting: `speech` holds the track it reads. */
+/** `pose` with `more`'s offsets added. */
+function added(pose: Partial<Pose>, more: Partial<Pose>): Partial<Pose> {
+  const out = { ...pose }
+  for (const key of Object.keys(more) as (keyof Pose)[]) {
+    out[key] = (out[key] ?? 0) + (more[key] ?? 0)
+  }
+  return out
+}
+
+/**
+ * `source`'s speech with Sam's acting: as she speaks, from the track `speech`
+ * holds, and as she listens, from `listening`.
+ */
 export function gesturedSource(
   source: SpeechSource,
-  speech: { readonly track: SpeechTrack }
+  speech: { readonly track: SpeechTrack },
+  listening: Listening
 ): SpeechSource {
   const follower = new ActingFollower()
   let utterance = 0
@@ -364,7 +378,11 @@ export function gesturedSource(
       speaking = now
       const target = now ? actingAt(speech.track, offset, utterance) : STILL
       const { relax, ...pose } = follower.step(target, now, nowMs)
-      return { ...sample, gesture: { relax, pose } }
+      const heard = listening.actingAt(nowMs)
+      return {
+        ...sample,
+        gesture: { relax, pose: added(pose, heard.pose), attend: heard.attend },
+      }
     },
     reset() {
       follower.reset()

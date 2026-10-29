@@ -16,7 +16,7 @@ from pipecat.processors.frameworks.rtvi import RTVIServerMessageFrame
 from pipecat.utils.text.base_text_aggregator import TextType
 from typesafe_sdk import AsyncTypeSafeClient, RetryPolicy, TypeSafeError
 
-from avatar.cues import cue_questions, cue_state
+from avatar.cues import cue_questions, cue_state, last_said
 
 CUE_MESSAGE_TYPE = "avatar-cue"
 # A reaction plays only when Jev gives it this much of its probability: most
@@ -84,7 +84,8 @@ class AvatarDirector(FrameProcessor):
                 self._last_reaction = SOUND_REACTIONS[sound]
                 await self._send_cue(frame.id, None, self._last_reaction)
         elif frame.text_type == TextType.SENTENCE and frame.text.strip():
-            state = cue_state(self._customer_said(), list(self._said), frame.text.strip())
+            customer_said = last_said(self._context, "user")
+            state = cue_state(customer_said, list(self._said), frame.text.strip())
             self._said.append(frame.text.strip())
             task = self.create_task(self._ask_jev(frame.id, state), f"cue-{frame.id}")
             self._tasks.add(task)
@@ -119,17 +120,3 @@ class AvatarDirector(FrameProcessor):
             "reaction": reaction,
         }
         await self.push_frame(RTVIServerMessageFrame(data=data))
-
-    def _customer_said(self) -> str:
-        """The customer's last message, with how they sounded at its head."""
-        for message in reversed(self._context.get_messages()):
-            if not isinstance(message, dict) or message.get("role") != "user":
-                continue
-            content = message.get("content")
-            if isinstance(content, str):
-                return content
-            if isinstance(content, list):
-                return " ".join(
-                    part.get("text", "") for part in content if isinstance(part, dict)
-                ).strip()
-        return ""

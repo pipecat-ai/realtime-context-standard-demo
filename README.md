@@ -11,11 +11,19 @@ customer is done.
 ## Server
 
 ```
-Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
+Deepgram Flux (STT) → avatar listener → Tone reader → PhoneLLM Mini on Baseten (LLM)
     → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS) → phone timer → avatar director
     → lipsync
 ```
 
+- **Avatar listener** (`server/avatar/listener.py`) has the avatar listen as the user
+  talks. It nods along at the user's pauses, from their audio alone: the likelier the
+  longer they've talked, never closer than about two seconds apart. With
+  `TYPESAFE_API_KEY`, Jev also reads the user's newest words from Flux's interim
+  transcript as each phrase ends, at most every second and a half, for a reaction
+  (shocked, a laugh, a sympathetic shake of the head) and the face Sam listens with. A
+  reading that comes back after the user has said much more is dropped, a reaction
+  replaces the nod it lands with, and each plays once a turn.
 - **Tone reader** reads each user turn, with the bot's line before it, for emotion and
   sarcasm. The LLM gets the reading with the user's message.
 - **Tone tagger** voices each sentence the LLM writes with the TTS's tags, breaths
@@ -135,7 +143,9 @@ phrase starts after a pause, and her expression's smile eases while she talks.
 `client/src/lib/lipsync-aligner.ts` keeps it all on the voice as it's heard: it matches
 the batches' energy against the bot's audio as it plays, and delays the face by the lag
 between them. Each line's expression and gesture, from the avatar director, plays as the
-line is heard.
+line is heard. While the user talks, `client/src/lib/listening.ts` has her listen: she
+turns to them, a little tilted and leaning in with her eyes on theirs, and plays the
+avatar listener's nods, reactions and faces as they arrive.
 
 Under each user line are the Tone reader's emotion and sarcasm; under
 each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and

@@ -4,12 +4,13 @@
 # SPDX-License-Identifier: BSD 2-Clause License
 #
 
-"""What Jev is asked about each line Sam speaks.
+"""What Jev is asked about each line Sam speaks, and about what the customer says as Sam listens.
 
 The expressions and reactions are the client avatar's (client/public/avatar/
-animation.json): a held expression for the line, and a brief gesture over it.
+animation.json): a held expression, and a brief gesture over it.
 """
 
+from pipecat.processors.aggregators.llm_context import LLMContext
 from typesafe_sdk import Choice
 
 SAM = (
@@ -46,6 +47,24 @@ NOTHING_SAID = "(nothing yet: Sam is starting the call)"
 FIRST_LINE = "(nothing: this is the first line of Sam's reply)"
 
 
+def last_said(context: LLMContext, role: str) -> str:
+    """The conversation's last message from `role` ("user" or "assistant"), as text.
+
+    The customer's starts with how they sounded, which the Tone reader adds.
+    """
+    for message in reversed(context.get_messages()):
+        if not isinstance(message, dict) or message.get("role") != role:
+            continue
+        content = message.get("content")
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            return " ".join(
+                part.get("text", "") for part in content if isinstance(part, dict)
+            ).strip()
+    return ""
+
+
 def cue_state(customer_said: str, said_before: list[str], line: str) -> dict:
     """The call as Jev sees it when Sam is about to say `line`."""
     return {
@@ -71,5 +90,66 @@ def cue_questions() -> dict[str, Choice]:
             instructions=situation
             + "Should Sam's face also make a brief gesture while saying `line`, and which?",
             criteria=REACTIONS,
+        ),
+    }
+
+
+LISTENER = (
+    "Sam, a friendly customer service agent for Northwind Outfitters, an outdoor gear shop, "
+    "on a voice call. The customer is talking and Sam is listening; Sam's face is shown."
+)
+
+# What a listener's face does at what was just said: for most of it, nothing.
+LISTENING_REACTIONS = {
+    "none": "Nothing beyond listening, as for almost everything a customer says.",
+    "shocked": (
+        "A start of alarm or astonishment: the newest words reveal something startling, "
+        "dangerous or wildly wrong, like a fire, an injury, an accident, or something absurd."
+    ),
+    "laugh": "A laugh: the newest words are a joke, or something the customer means to be funny.",
+    "shake": (
+        "A slow, sympathetic shake of the head: the newest words tell of something unfair or "
+        "unacceptable done to the customer, like being charged twice or ignored for weeks."
+    ),
+}
+
+LISTENING_FACES = {
+    "neutral": "Attentive: the customer explains, asks for something, or gives details.",
+    "happy": "Warm: the customer is friendly, thanks Sam, jokes, or shares good news.",
+    "upset": "Concerned: the customer describes a real problem, a loss, or a frustration.",
+    "thinking": (
+        "Concentrating: the customer asks something Sam will have to work out, or reels off "
+        "numbers and details to take in."
+    ),
+}
+
+NOTHING_BEFORE = "(nothing: these are the first words of the customer's turn)"
+
+
+def listen_state(sam_said: str, heard_before: str, newest: str) -> dict:
+    """The call as Jev sees it while the customer is saying `newest`."""
+    return {
+        "sam": LISTENER,
+        "sam_said": sam_said or NOTHING_SAID,
+        "customer_said_before": heard_before or NOTHING_BEFORE,
+        "newest": newest,
+    }
+
+
+def listen_questions() -> dict[str, Choice]:
+    """A reaction to the customer's newest words, and the face Sam listens with."""
+    situation = (
+        "The customer is still talking, answering `sam_said`. They have said "
+        "`customer_said_before`, and just now `newest`. "
+    )
+    return {
+        "reaction": Choice(
+            instructions=situation
+            + "Should Sam's face react to `newest` right now, as a listener would, and how?",
+            criteria=LISTENING_REACTIONS,
+        ),
+        "face": Choice(
+            instructions=situation + "Which expression should Sam's face hold while listening?",
+            criteria=LISTENING_FACES,
         ),
     }

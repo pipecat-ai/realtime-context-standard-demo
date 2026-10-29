@@ -2715,7 +2715,7 @@ var AvatarFrameDriver = class {
     let owner = stepSpeechOwnership(this.speechOwnership, speaking, wall);
     if (!speaking && owner < OWNER_EPSILON && atRest(articulation)) owner = 0;
     this.speechOwnership = owner;
-    this.gazeOwnership = stepGazeOwnership(this.gazeOwnership, speaking, wall);
+    this.gazeOwnership = stepGazeOwnership(this.gazeOwnership, speaking || speech?.gesture?.attend === true, wall);
     const base = this.idle.sample((idleMs - this.started) / 1e3, dt, reducedMotion ? 0 : motion);
     const acted = this.reactions.step({
       basePose: this.spring.step(dt),

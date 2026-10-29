@@ -10,11 +10,15 @@ export function useAvatarCues() {
   const userStartedSpeaking = useAvatarCueStore(
     (state) => state.userStartedSpeaking
   )
+  const botStartedSpeaking = useAvatarCueStore(
+    (state) => state.botStartedSpeaking
+  )
   const reset = useAvatarCueStore((state) => state.reset)
 
   useRTVIClientEvent(RTVIEvent.ServerMessage, serverMessage)
   useRTVIClientEvent(RTVIEvent.BotOutput, botOutput)
   useRTVIClientEvent(RTVIEvent.UserStartedSpeaking, userStartedSpeaking)
+  useRTVIClientEvent(RTVIEvent.BotStartedSpeaking, botStartedSpeaking)
   useRTVIClientEvent(RTVIEvent.Connected, reset)
   useRTVIClientEvent(RTVIEvent.Disconnected, reset)
 }

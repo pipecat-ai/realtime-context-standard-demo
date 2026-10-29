@@ -1,13 +1,24 @@
 import type { BotOutputData } from "@pipecat-ai/client-js"
 import { create } from "zustand"
 
-import { lipsync, useAvatarStore } from "@/stores/avatar-store"
+import { lipsync, listening, useAvatarStore } from "@/stores/avatar-store"
 
-/** Sam's face for one line, from Jev (server/avatar/). */
+/** Sam's face for one line, from Jev (server/avatar/director.py). */
 interface AvatarCue {
   segment: number
   expression: string | null
   reaction: string | null
+}
+
+/**
+ * What Sam does as the user talks (server/avatar/listener.py), as it comes: a
+ * nod, or a reaction and a face.
+ */
+interface ListenCue {
+  nod?: number
+  double?: boolean
+  expression?: string | null
+  reaction?: string | null
 }
 
 const isCue = (data: unknown): data is AvatarCue & { type: "avatar-cue" } =>
@@ -15,7 +26,12 @@ const isCue = (data: unknown): data is AvatarCue & { type: "avatar-cue" } =>
   data !== null &&
   (data as { type?: unknown }).type === "avatar-cue"
 
-/** The face Sam listens with. */
+const isListenCue = (data: unknown): data is ListenCue =>
+  typeof data === "object" &&
+  data !== null &&
+  (data as { type?: unknown }).type === "avatar-listen"
+
+/** The face Sam starts listening with. */
 const LISTENING = "neutral"
 
 function play({
@@ -26,6 +42,14 @@ function play({
   if (expression) avatar.setExpression(expression)
   // Rejects only while no avatar is mounted, when there's no face to move.
   if (reaction) avatar.react(reaction).catch(() => undefined)
+}
+
+function hear({ nod, double, expression, reaction }: ListenCue) {
+  // A reaction has the head while it plays.
+  if (typeof nod === "number" && !useAvatarStore.getState().reaction) {
+    listening.nod(nod, double === true)
+  }
+  play({ expression: expression ?? null, reaction: reaction ?? null })
 }
 
 /**
@@ -41,8 +65,9 @@ interface AvatarCueState {
   started: Record<number, "playing" | "done">
   serverMessage: (data: unknown) => void
   botOutput: (data: BotOutputData) => void
-  /** Sam listens while the user talks. */
+  /** Sam listens from the start of the user's turn until she answers. */
   userStartedSpeaking: () => void
+  botStartedSpeaking: () => void
   reset: () => void
 }
 
@@ -50,6 +75,10 @@ export const useAvatarCueStore = create<AvatarCueState>()((set, get) => ({
   cues: {},
   started: {},
   serverMessage: (data) => {
+    if (isListenCue(data)) {
+      hear(data)
+      return
+    }
     if (!isCue(data)) return
     const { segment, expression, reaction } = data
     const started = get().started[segment]
@@ -75,10 +104,15 @@ export const useAvatarCueStore = create<AvatarCueState>()((set, get) => ({
     }
   },
   userStartedSpeaking: () => {
+    listening.listen(true)
     play({ expression: LISTENING, reaction: null })
+  },
+  botStartedSpeaking: () => {
+    listening.listen(false)
   },
   reset: () => {
     set({ cues: {}, started: {} })
+    listening.listen(false)
     play({ expression: LISTENING, reaction: null })
   },
 }))

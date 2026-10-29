@@ -63,9 +63,10 @@ export interface SpeechSample {
   /**
    * realtime-context-standard-demo: the speech's own acting, which the creator's export lacks (scripts/use-avatar.sh
    * applies it). `pose` is added to the frame's pose, its head, brows and eyes scaled by the motion (none with reduced
-   * motion); `relax` (0–1) eases the expression's smile and smirk towards rest.
+   * motion); `relax` (0–1) eases the expression's smile and smirk towards rest; `attend` holds the gaze on the viewer,
+   * as speaking does, while listening.
    */
-  gesture?: { pose?: Partial<Pose>; relax?: number };
+  gesture?: { pose?: Partial<Pose>; relax?: number; attend?: boolean };
 }
 
 /** Where a player's speech comes from. `sample` never returns null: with nothing to say it reports rest, not speaking. */

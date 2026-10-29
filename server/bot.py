@@ -14,9 +14,11 @@ with Pipecat Tone reading the user and voicing the bot:
 
 The lipsync processor reads the bot's voice for its mouth shapes, which the
 client's avatar speaks with (``lipsync/``, from pipecat-visemes), and the
-phone timer times the phones of each word, which shape its lips. With a
-``TYPESAFE_API_KEY``, Jev reads each line Sam speaks for the avatar's expression
-and reaction (``avatar/``).
+phone timer times the phones of each word, which shape its lips. While the user
+talks, the avatar listens: it nods along at their pauses (``avatar/``). With a
+``TYPESAFE_API_KEY``, Jev also reads each line Sam speaks for the avatar's
+expression and reaction, and the user's newest words for its reactions as it
+listens.
 
 Three start-time options, read from the ``/start`` request body, swap parts:
 
@@ -71,7 +73,7 @@ from pipecat.transports.daily.transport import DailyParams
 from pipecat.turns.user_mute import MuteUntilFirstBotCompleteUserMuteStrategy
 from pipecat.workers.runner import WorkerRunner
 
-from avatar import AvatarDirector, PhoneTimer
+from avatar import AvatarDirector, AvatarListener, PhoneTimer
 from backchannel import BackchannelFluxSTTService
 from lipsync import LipsyncMessageRelay, LipsyncProcessor
 from meter import MoodMeter
@@ -272,6 +274,9 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
         [
             transport.input(),
             stt,
+            # The avatar's nods and reactions as the user talks, from their audio
+            # and the interim transcript.
+            AvatarListener(context, read=bool(os.getenv("TYPESAFE_API_KEY"))),
             tone_reader,
             user_aggregator,
             llm,
