@@ -12,8 +12,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
 
-# Copy the application code
+# Copy the application code: the bot and the modules it imports
 COPY ./bot.py bot.py
 COPY ./tools.py tools.py
-COPY ./lipsync lipsync
+COPY ./meter.py meter.py
 COPY ./avatar avatar
+COPY ./backchannel backchannel
+COPY ./lipsync lipsync
