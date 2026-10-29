@@ -10,12 +10,14 @@ import { UserAudioControl } from "@/components/pipecat/user-audio-control"
 import { CallButton } from "@/components/call-button"
 import { SettingsButton } from "@/components/settings-button"
 import { StatusBadge } from "@/components/status-badge"
+import { WakingNotice } from "@/components/waking-notice"
 import { AmbientBackground } from "@/glass"
-import { useAgentStatus } from "@/hooks/use-agent-status"
+import { useAgentStatus, useLlmWaking } from "@/hooks/use-agent-status"
 import { demoCaller, isDemo } from "@/lib/demo"
 import { moodPalette } from "@/lib/mood-palette"
 import { cn } from "@/lib/utils"
 import { lipsync, useAvatarStore } from "@/stores/avatar-store"
+import { useSessionStore } from "@/stores/session-store"
 
 /** The Deepgram demo's outline button: a 1.5px white ring on no fill. */
 const OUTLINE_PILL =
@@ -49,9 +51,20 @@ interface StageProps {
 export function Stage({ connect, disconnect, error, className }: StageProps) {
   const transportState = usePipecatClientTransportState()
   const status = useAgentStatus()
+  const waking = useLlmWaking()
   const expression = useAvatarStore((state) => state.expression)
   const { isMicEnabled } = usePipecatClientMicControl()
+  const setMode = useSessionStore((state) => state.setMode)
   const connectable = CONNECTABLE.includes(transportState)
+
+  // While Tagger mode's model wakes: a new call in LLM mode, from the tap, as
+  // the call button starts one.
+  const switchToLlm = async () => {
+    lipsync.resume()
+    await disconnect()
+    setMode("llm")
+    await connect()
+  }
 
   return (
     // Below lg a band of the screen, 40% of its height, enough for Sam's lips
@@ -108,7 +121,17 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
             )}
           </div>
         </div>
-        <BotAvatar className="min-h-0 w-full flex-1 drop-shadow-avatar" />
+        <div className="relative flex min-h-0 w-full flex-1 flex-col">
+          <BotAvatar className="min-h-0 w-full flex-1 drop-shadow-avatar" />
+          {/* Over Sam's shoulders. A phone's stage is too short for that,
+              so there it takes a row of its own and Sam makes room. */}
+          {waking && (
+            <WakingNotice
+              onSwitch={() => void switchToLlm()}
+              className="z-10 mx-auto mt-3 w-fit shrink-0 sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0"
+            />
+          )}
+        </div>
         <CallButton
           status={status}
           connectable={connectable}

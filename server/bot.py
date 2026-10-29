@@ -18,7 +18,8 @@ phone timer times the phones of each word, which shape its lips. While the user
 talks, the avatar listens: it nods along at their pauses (``avatar/``). With a
 ``TYPESAFE_API_KEY``, Jev also reads each line Sam speaks for the avatar's
 expression and reaction, and the user's newest words for its reactions as it
-listens.
+listens. While PhoneLLM Mini wakes, if Baseten has scaled it to zero, Sam says
+she's starting up and the client shows the model waking (``cold_start.py``).
 
 Four start-time options, read from the ``/start`` request body, swap parts:
 
@@ -86,9 +87,11 @@ from pipecat.workers.runner import WorkerRunner
 
 from avatar import AvatarDirector, AvatarListener, PhoneTimer
 from backchannel import BackchannelFluxSTTService
+from cold_start import ColdStartGuard
 from demo import DemoCaller
 from lipsync import LipsyncMessageRelay, LipsyncProcessor
 from meter import MoodMeter
+from prefetch import READER, TAGGER
 from tools import TOOLS, OrderStore
 
 load_dotenv(override=True)
@@ -279,7 +282,7 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     # Reads each final transcription for the user's emotion and sarcasm, with
     # the bot's line before it. The LLM gets the reading at the head of the
     # user's message.
-    tone_reader = PipecatToneReader()
+    tone_reader = PipecatToneReader(**READER)
 
     llm = build_llm(options)
     tts = build_tts(options)
@@ -291,7 +294,8 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     user_aggregator, assistant_aggregator = LLMContextAggregatorPair(
         context,
         # Sam's greeting plays out before the user is heard, so noise or echo
-        # as the call connects can't interrupt it or reach the LLM.
+        # as the call connects can't interrupt it or reach the LLM. While a
+        # cold LLM wakes, her first holding line takes its place.
         user_params=LLMUserAggregatorParams(
             user_mute_strategies=[MuteUntilFirstBotCompleteUserMuteStrategy()],
             # Flux can end a turn at a pause the user hasn't finished at, such as
@@ -320,11 +324,14 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
             AvatarListener(context, read=bool(os.getenv("TYPESAFE_API_KEY"))),
             user_aggregator,
             llm,
+            # While PhoneLLM Mini wakes on Baseten, Sam says so, and the client
+            # shows it.
+            *([ColdStartGuard(llm)] if options.use_tagger else []),
             # Tells the demo caller while Sam's reply is being written.
             *([demo_caller.replies] if demo_caller else []),
             # The LLM writes plain words; the tagger voices each sentence with the
             # tags the TTS performs. Without it, the LLM writes them.
-            *([PipecatToneTagger()] if options.use_tagger else []),
+            *([PipecatToneTagger(**TAGGER)] if options.use_tagger else []),
             tts,
             # The phones of each word spoken, which shape the avatar's lips.
             PhoneTimer(),

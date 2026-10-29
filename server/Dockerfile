@@ -12,11 +12,21 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
 
+# The models each call would otherwise download from Hugging Face as it starts,
+# holding Sam's greeting: the Tone reader and tagger, and the backchannel model.
+# Calls load these copies and never ask Hugging Face.
+ENV HF_HOME=/app/models/huggingface \
+    BACKCHANNEL_CACHE_DIR=/app/models/backchannel
+COPY ./backchannel backchannel
+COPY ./prefetch.py prefetch.py
+RUN /app/.venv/bin/python prefetch.py
+ENV HF_HUB_OFFLINE=1
+
 # Copy the application code: the bot and the modules it imports
 COPY ./bot.py bot.py
 COPY ./tools.py tools.py
 COPY ./meter.py meter.py
 COPY ./demo.py demo.py
+COPY ./cold_start.py cold_start.py
 COPY ./avatar avatar
-COPY ./backchannel backchannel
 COPY ./lipsync lipsync

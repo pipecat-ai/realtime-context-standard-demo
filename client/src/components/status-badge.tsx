@@ -15,6 +15,16 @@ const DOT: Record<AgentStatus, string> = {
   listening: "bg-client",
   thinking: "bg-agent motion-safe:animate-pulse",
   speaking: "bg-agent",
+  waking: "bg-agent motion-safe:animate-pulse",
+}
+
+/** A status that reads better in words than as its name. */
+const LABEL: Partial<Record<AgentStatus, string>> = { waking: "waking up" }
+
+/** Read out after a status, for what the screen shows beside it. */
+const DETAIL: Partial<Record<AgentStatus, string>> = {
+  waking:
+    "PhoneLLM Mini can take a few minutes to wake. Use LLM mode, below Sam, to switch.",
 }
 
 /** How much bigger a new face starts, as big as the badge is tall. */
@@ -131,7 +141,12 @@ export function StatusBadge({
           error ? "bg-inactive" : DOT[status]
         )}
       />
-      <span className="readout-label text-foreground">{error ?? status}</span>
+      <span className="readout-label text-foreground">
+        {error ?? LABEL[status] ?? status}
+      </span>
+      {!error && DETAIL[status] && (
+        <span className="sr-only">{DETAIL[status]}</span>
+      )}
       {/* Not announced: the face changes with nearly every line Sam says. */}
       {!error && (
         <>
