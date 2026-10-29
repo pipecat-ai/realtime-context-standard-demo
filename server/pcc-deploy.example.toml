@@ -18,6 +18,8 @@ agent_profile = "agent-2x"
 [krisp_viva]
 audio_filter = "pro"
 
-# Warm agents kept ready for new sessions; each one is billed while idle.
+# Warm agents kept ready for new sessions; each one is billed while idle. Up to
+# max_agents run at once, which can't be fewer than min_agents.
 [scaling]
 min_agents = 50
+max_agents = 50
