@@ -4,19 +4,13 @@ version = "0.1.0"
 description = "Northwind Outfitters support agent: Deepgram Flux, PhoneLLM Mini, Pipecat Tone"
 requires-python = ">=3.11"
 dependencies = [
-    "pipecat-ai[baseten,cartesia,daily,deepgram,elevenlabs,openai,runner,tone,webrtc]",
+    "pipecat-ai[baseten,cartesia,daily,deepgram,elevenlabs,openai,runner,tone,webrtc]>=1.15.0",
     "pipecatcloud>=1.2.0",
     "typesafe-sdk>=0.7.5",
 ]
 
 [dependency-groups]
 dev = ["pipecat-ai[cli]", "pyright>=1.1.404,<2", "ruff>=0.12.11,<1"]
-
-# Pipecat Tone's rc1 models and the reader's perception on RTVI user-input are on
-# main but not yet released; uv.lock pins the commit. Drop this source and pin a
-# release once they ship.
-[tool.uv.sources]
-pipecat-ai = { git = "https://github.com/pipecat-ai/pipecat.git", branch = "main" }
 
 [tool.pyright]
 # Copied as they are from pipecat-visemes and pipecat-vap, which don't type-check them

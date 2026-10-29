@@ -16,6 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY ./bot.py bot.py
 COPY ./tools.py tools.py
 COPY ./meter.py meter.py
+COPY ./demo.py demo.py
 COPY ./avatar avatar
 COPY ./backchannel backchannel
 COPY ./lipsync lipsync

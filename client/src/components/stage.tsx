@@ -12,6 +12,7 @@ import { SettingsButton } from "@/components/settings-button"
 import { StatusBadge } from "@/components/status-badge"
 import { AmbientBackground } from "@/glass"
 import { useAgentStatus } from "@/hooks/use-agent-status"
+import { demoCaller, isDemo } from "@/lib/demo"
 import { moodPalette } from "@/lib/mood-palette"
 import { cn } from "@/lib/utils"
 import { lipsync, useAvatarStore } from "@/stores/avatar-store"
@@ -80,15 +81,18 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
             // Without its min height, the hidden badge's glass is a speck.
             className={cn("min-w-0", !error && "max-sm:sr-only max-sm:min-h-0")}
           />
-          {/* Right-aligned even when a long mic error wraps it under. */}
+          {/* Right-aligned even when a long mic error wraps it under. A
+              demo has no mic, and its options are set by its URL. */}
           <div className="ml-auto flex items-center gap-3">
-            <UserAudioControl
-              variant="ghost"
-              size="lg"
-              visualizerProps={{
-                barColor: isMicEnabled ? MIC_BARS.live : MIC_BARS.muted,
-              }}
-            />
+            {!isDemo && (
+              <UserAudioControl
+                variant="ghost"
+                size="lg"
+                visualizerProps={{
+                  barColor: isMicEnabled ? MIC_BARS.live : MIC_BARS.muted,
+                }}
+              />
+            )}
             <BotAudioControl
               size="icon-lg"
               variant="outline"
@@ -96,10 +100,12 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
               sliderProps={{ orientation: "vertical" }}
               className={cn(OUTLINE_PILL, "max-sm:hidden")}
             />
-            <SettingsButton
-              locked={!connectable}
-              className={cn(OUTLINE_PILL, "max-sm:hidden")}
-            />
+            {!isDemo && (
+              <SettingsButton
+                locked={!connectable}
+                className={cn(OUTLINE_PILL, "max-sm:hidden")}
+              />
+            )}
           </div>
         </div>
         <BotAvatar className="min-h-0 w-full flex-1 drop-shadow-avatar" />
@@ -108,8 +114,10 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
           connectable={connectable}
           onClick={() => {
             if (!connectable) return void disconnect()
-            // In the tap, so the browser lets the mouth hear the voice.
+            // In the tap, so the browser lets the mouth hear the voice, and
+            // a demo's caller be heard.
             lipsync.resume()
+            demoCaller?.resume()
             void connect()
           }}
           disabled={

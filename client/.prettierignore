@@ -1,7 +1,6 @@
 dist
 node_modules
 pnpm-lock.yaml
-vendor
 src/assets
 
 # Vendored from the shadcn and Pipecat UI registries; see eslint.config.js.

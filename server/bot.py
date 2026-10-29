@@ -20,13 +20,15 @@ talks, the avatar listens: it nods along at their pauses (``avatar/``). With a
 expression and reaction, and the user's newest words for its reactions as it
 listens.
 
-Three start-time options, read from the ``/start`` request body, swap parts:
+Four start-time options, read from the ``/start`` request body, swap parts:
 
 - ``tts``: ``"elevenlabs"`` (default) or ``"cartesia"``.
 - ``use_tagger``: ``"true"`` (default) or ``"false"``, which drops the tagger
   and has GPT-5.6 Luna write the expression tags itself.
 - ``detect_backchannels``: ``"true"`` (default), which keeps Sam talking
   through the user's backchannels (``backchannel/``), or ``"false"``.
+- ``demo``: ``"false"`` (default), or ``"true"``, which has a scripted caller
+  talk to Sam in place of the mic (``demo.py``).
 
 Run the bot using::
 
@@ -71,10 +73,20 @@ from pipecat.services.tts_service import TTSService
 from pipecat.transports.base_transport import BaseTransport, TransportParams
 from pipecat.transports.daily.transport import DailyParams
 from pipecat.turns.user_mute import MuteUntilFirstBotCompleteUserMuteStrategy
+from pipecat.turns.user_turn_completion_mixin import (
+    USER_TURN_COMPLETION_INSTRUCTIONS,
+    UserTurnCompletionConfig,
+)
+from pipecat.turns.user_turn_strategies import (
+    FilterIncompleteUserTurnStrategies,
+    MergeMode,
+    UserTurnStrategiesParams,
+)
 from pipecat.workers.runner import WorkerRunner
 
 from avatar import AvatarDirector, AvatarListener, PhoneTimer
 from backchannel import BackchannelFluxSTTService
+from demo import DemoCaller
 from lipsync import LipsyncMessageRelay, LipsyncProcessor
 from meter import MoodMeter
 from tools import TOOLS, OrderStore
@@ -95,8 +107,8 @@ SYSTEM_INSTRUCTION = (
     "Before cancelling an order, confirm the customer wants it cancelled. "
     "Only give order details your tools returned: never guess a status, date, price, or "
     "tracking number. "
-    "For returns, exchanges, or anything else your tools can't do, tell the customer to "
-    "email help@northwind.com. "
+    "Returns and exchanges are handled by email: tell the customer to write to "
+    "help@northwind.com, as for anything else you can't do for them. "
     "When the customer says goodbye, or their question is settled and they need nothing "
     "else, say a short goodbye and then call end_call in that same turn. "
     'Don\'t narrate your own tool use — no "let me check" or "one moment". Either answer, '
@@ -117,6 +129,15 @@ READING_GUIDANCE = [
     "answer what they mean.",
 ]
 
+# Pipecat's instructions for marking each user turn complete or not, and that a
+# goodbye is still complete with a tool call: without it, PhoneLLM Mini says
+# goodbye and never calls end_call.
+TURN_COMPLETION = UserTurnCompletionConfig(
+    instructions=USER_TURN_COMPLETION_INSTRUCTIONS
+    + "\n- A reply can be ● and a tool call together: when the customer says goodbye, "
+    "write ● and your goodbye, then call end_call in the same response."
+)
+
 TTSName = Literal["elevenlabs", "cartesia"]
 
 
@@ -132,6 +153,8 @@ class BotOptions:
     # ("mm-hmm"), which leaves Sam talking, or an interruption. False: all of it
     # interrupts her.
     detect_backchannels: bool = True
+    # True: a scripted caller talks to Sam, in place of the mic.
+    demo: bool = False
 
     @classmethod
     def from_body(cls, body: Any) -> "BotOptions":
@@ -139,18 +162,18 @@ class BotOptions:
         tts = body.get("tts", cls.tts)
         if tts not in get_args(TTSName):
             raise ValueError(f"tts must be one of {get_args(TTSName)}, got {tts!r}")
-        use_tagger = str(body.get("use_tagger", cls.use_tagger)).lower()
-        if use_tagger not in ("true", "false"):
-            raise ValueError(f"use_tagger must be 'true' or 'false', got {use_tagger!r}")
-        detect_backchannels = str(body.get("detect_backchannels", cls.detect_backchannels)).lower()
-        if detect_backchannels not in ("true", "false"):
-            raise ValueError(
-                f"detect_backchannels must be 'true' or 'false', got {detect_backchannels!r}"
-            )
+
+        def flag(name: str) -> bool:
+            value = str(body.get(name, getattr(cls, name))).lower()
+            if value not in ("true", "false"):
+                raise ValueError(f"{name} must be 'true' or 'false', got {value!r}")
+            return value == "true"
+
         return cls(
             tts=tts,
-            use_tagger=use_tagger == "true",
-            detect_backchannels=detect_backchannels == "true",
+            use_tagger=flag("use_tagger"),
+            detect_backchannels=flag("detect_backchannels"),
+            demo=flag("demo"),
         )
 
 
@@ -261,6 +284,9 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
     llm = build_llm(options)
     tts = build_tts(options)
 
+    # In demo mode, the scripted caller in place of the mic.
+    demo_caller = DemoCaller() if options.demo else None
+
     context = LLMContext(tools=TOOLS)
     user_aggregator, assistant_aggregator = LLMContextAggregatorPair(
         context,
@@ -268,19 +294,34 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
         # as the call connects can't interrupt it or reach the LLM.
         user_params=LLMUserAggregatorParams(
             user_mute_strategies=[MuteUntilFirstBotCompleteUserMuteStrategy()],
+            # Flux can end a turn at a pause the user hasn't finished at, such as
+            # partway through an order number. The LLM marks each turn complete
+            # or not before it answers, and an incomplete one stays open for the
+            # user to go on. Extending Flux's own strategies, start and stop,
+            # keeps its turn detection and the backchannel model's hold on the
+            # turns it starts over Sam.
+            user_turn_strategies=FilterIncompleteUserTurnStrategies(config=TURN_COMPLETION),
+            user_turn_strategies_params=UserTurnStrategiesParams(
+                start_merge_mode=MergeMode.EXTEND, stop_merge_mode=MergeMode.EXTEND
+            ),
         ),
     )
 
     pipeline = Pipeline(
         [
             transport.input(),
+            *([demo_caller] if demo_caller else []),
             stt,
+            # Next to the STT, so RTVI's user-input waits for the reading: it goes
+            # out once a transcription passes the processor after the STT.
+            tone_reader,
             # The avatar's nods and reactions as the user talks, from their audio
             # and the interim transcript.
             AvatarListener(context, read=bool(os.getenv("TYPESAFE_API_KEY"))),
-            tone_reader,
             user_aggregator,
             llm,
+            # Tells the demo caller while Sam's reply is being written.
+            *([demo_caller.replies] if demo_caller else []),
             # The LLM writes plain words; the tagger voices each sentence with the
             # tags the TTS performs. Without it, the LLM writes them.
             *([PipecatToneTagger()] if options.use_tagger else []),

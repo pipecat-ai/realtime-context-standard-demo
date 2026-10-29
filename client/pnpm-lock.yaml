@@ -18,17 +18,17 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@pipecat-ai/client-js':
-        specifier: file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz
-        version: file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz
+        specifier: ^1.16.0
+        version: 1.16.0
       '@pipecat-ai/client-react':
-        specifier: file:vendor/pipecat-ai-client-react-1.10.0-68428ba.tgz
-        version: file:vendor/pipecat-ai-client-react-1.10.0-68428ba.tgz(@babel/core@8.0.9)(@babel/template@8.0.0)(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.11.0
+        version: 1.11.0(@babel/core@8.0.9)(@babel/template@8.0.0)(@pipecat-ai/client-js@1.16.0)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@pipecat-ai/daily-transport':
-        specifier: ^1.7.1
-        version: 1.7.1(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)
+        specifier: ^1.7.2
+        version: 1.7.2(@pipecat-ai/client-js@1.16.0)
       '@pipecat-ai/small-webrtc-transport':
-        specifier: ^1.11.1
-        version: 1.11.1(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)
+        specifier: ^1.11.2
+        version: 1.11.2(@pipecat-ai/client-js@1.16.0)
       '@tabler/icons-react':
         specifier: ^3.50.0
         version: 3.50.0(react@19.3.1)
@@ -567,29 +567,25 @@ packages:
   '@oxc-project/types@0.155.0':
     resolution: {integrity: sha512-SeE8JPwW1xs1tHeNycjUtUBdhorRa8o4jlvjwk49R7/Z291i+4DQa7JJIgOm/TaYQZx+QrPQbVJ/9c8dMIZN8Q==}
 
-  '@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz':
-    resolution: {integrity: sha512-/ohbo3dZdZgTzylQa/1thJ2BhlZCTD4mVPXbnQ4sgG2GDe1Jh8u2uaMCW+7aGkOWKhTDgRxh0MY1VlqdcLiyrA==, tarball: file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz}
-    version: 1.15.0
+  '@pipecat-ai/client-js@1.16.0':
+    resolution: {integrity: sha512-rQyct+EghojirF/FSmXMMVkw2vdyO27AmZuNcpurDmbO88NBDtLgjr3X1WdpTYwBcyZMcoks4Cf8uIiUir2b8g==}
 
-  '@pipecat-ai/client-react@file:vendor/pipecat-ai-client-react-1.10.0-68428ba.tgz':
-    resolution: {integrity: sha512-KR6MhHidT1di534hNOPYTWrWextYVVqpagb4fQ3sLOZx4YffOp7nWLq4JCZQmyfO2UIcOProfQJE0nZDJ86vSA==, tarball: file:vendor/pipecat-ai-client-react-1.10.0-68428ba.tgz}
-    version: 1.10.0
+  '@pipecat-ai/client-react@1.11.0':
+    resolution: {integrity: sha512-A2sWJVBVPnOQEDjfr/gqHhOsvR8QUXJefOKNTzl5kS8hXf7k70ivMMkH76f/Q44q2Z1h9ML1PY/gFx/k07PXvA==}
     peerDependencies:
       '@pipecat-ai/client-js': '>=1.14.0'
       react: '>=18'
       react-dom: '>=18'
 
-  '@pipecat-ai/daily-transport@1.7.1':
-    resolution: {integrity: sha512-4BeLBuuSzxCoNfeCbhMtU/w3FvG3VsFeE+DnuCcQDlE8A4ZfbshjoVhmkLfAOzn1xL0w670sXzmY0kG0WazHjQ==}
-    version: 1.7.1
+  '@pipecat-ai/daily-transport@1.7.2':
+    resolution: {integrity: sha512-e6dXRvFR63uDzFp+G1xrtxSoKqG2f6tGaaEJl5YuXDv1uIKb6Skzc9aGLFDXgpCR+DH+7J3ub6zE7b24ZppgJg==}
     peerDependencies:
-      '@pipecat-ai/client-js': ~1.15.0
+      '@pipecat-ai/client-js': ~1.16.0
 
-  '@pipecat-ai/small-webrtc-transport@1.11.1':
-    resolution: {integrity: sha512-BJhckQchn3gB5ayffblfJx7Tb5RTcOUAf2zZiV6BKSyUswkAVZT/QhZeryZpWzebhNrePDaq+aZD1NttgqKVug==}
-    version: 1.11.1
+  '@pipecat-ai/small-webrtc-transport@1.11.2':
+    resolution: {integrity: sha512-BcyxyFS1I+aaBJGGG4bSfD6vyZEzWtqxYm/YtecFSJtDZ6QiHKF+IAY1p9HQy7slAsohdQQTdN9GB1SaYt6zxQ==}
     peerDependencies:
-      '@pipecat-ai/client-js': ~1.15.0
+      '@pipecat-ai/client-js': ~1.16.0
 
   '@rolldown/binding-android-arm-eabi@1.2.15':
     resolution: {integrity: sha512-aLcgK9gIJ3YRvrrtfSBbRa27F5WrpiTaPulnFpsHPxpUHgFlSgnU4854MHwoRGEBhfRJDWCS2WQ7lIjskE9Olw==}
@@ -2975,7 +2971,7 @@ snapshots:
 
   '@oxc-project/types@0.155.0': {}
 
-  '@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz':
+  '@pipecat-ai/client-js@1.16.0':
     dependencies:
       '@types/events': 3.0.3
       bowser: 2.15.0
@@ -2984,9 +2980,9 @@ snapshots:
       typed-emitter: 2.1.0
       uuid: 11.1.1
 
-  '@pipecat-ai/client-react@file:vendor/pipecat-ai-client-react-1.10.0-68428ba.tgz(@babel/core@8.0.9)(@babel/template@8.0.0)(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@pipecat-ai/client-react@1.11.0(@babel/core@8.0.9)(@babel/template@8.0.0)(@pipecat-ai/client-js@1.16.0)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@pipecat-ai/client-js': file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz
+      '@pipecat-ai/client-js': 1.16.0
       jotai: 2.20.3(@babel/core@8.0.9)(@babel/template@8.0.0)(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
@@ -2995,15 +2991,15 @@ snapshots:
       - '@babel/template'
       - '@types/react'
 
-  '@pipecat-ai/daily-transport@1.7.1(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)':
+  '@pipecat-ai/daily-transport@1.7.2(@pipecat-ai/client-js@1.16.0)':
     dependencies:
       '@daily-co/daily-js': 0.94.0
-      '@pipecat-ai/client-js': file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz
+      '@pipecat-ai/client-js': 1.16.0
 
-  '@pipecat-ai/small-webrtc-transport@1.11.1(@pipecat-ai/client-js@file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz)':
+  '@pipecat-ai/small-webrtc-transport@1.11.2(@pipecat-ai/client-js@1.16.0)':
     dependencies:
       '@daily-co/daily-js': 0.94.0
-      '@pipecat-ai/client-js': file:vendor/pipecat-ai-client-js-1.15.0-68428ba.tgz
+      '@pipecat-ai/client-js': 1.16.0
       dequal: 2.0.3
       lodash: 4.18.1
 

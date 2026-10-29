@@ -526,12 +526,19 @@ export type DuplexTimelineProps = Omit<
   | "running"
   | "agentSpeaking"
   | "userSpeaking"
->;
+> & {
+  /** The user's lane, in place of the local mic's. */
+  userTrack?: MediaStreamTrack | null;
+};
 
 /** Requires PipecatClientProvider; scrolls while the transport is ready. */
-export function DuplexTimeline(props: DuplexTimelineProps) {
+export function DuplexTimeline({
+  userTrack: userTrackOverride,
+  ...props
+}: DuplexTimelineProps) {
   const agentTrack = usePipecatClientMediaTrack("audio", "bot");
-  const userTrack = usePipecatClientMediaTrack("audio", "local");
+  const localTrack = usePipecatClientMediaTrack("audio", "local");
+  const userTrack = userTrackOverride ?? localTrack;
   const running = usePipecatClientTransportState() === "ready";
   const { markers, agentSpeaking, userSpeaking } = useDuplexTimelineMarkers();
 

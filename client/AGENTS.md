@@ -18,7 +18,7 @@ These are the mandatory standards for all frontend code in `client/`. Follow the
 | Package manager  | pnpm                                                                     |
 | Runtime          | Node.js 22+                                                              |
 
-Use pnpm for everything (`pnpm add`, `pnpm dlx`, `pnpm <script>`), never npm or yarn, and commit only `pnpm-lock.yaml`. Always install the latest stable releases, with one exception: the Pipecat client packages track unreleased `main` until the standard they implement ships, so don't swap them for published versions. `@pipecat-ai/client-js` and `client-react` install from the tarballs in `vendor/`, built by `scripts/vendor-pipecat.sh <commit>`. Adding a Pipecat registry item with the shadcn CLI rewrites them to the published versions: point them back at `vendor/` afterwards. Ask before adding a dependency that isn't listed here, and prefer what's already installed.
+Use pnpm for everything (`pnpm add`, `pnpm dlx`, `pnpm <script>`), never npm or yarn, and commit only `pnpm-lock.yaml`. Always install the latest stable releases. Ask before adding a dependency that isn't listed here, and prefer what's already installed.
 
 Husky runs `lint`, `typecheck` and a Prettier check before every commit. Don't bypass it with `--no-verify`; fix what it reports.
 

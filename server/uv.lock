@@ -3057,8 +3057,8 @@ wheels = [
 
 [[package]]
 name = "pipecat-ai"
-version = "1.14.1.dev295"
-source = { git = "https://github.com/pipecat-ai/pipecat.git?branch=main#2529106e312f892145511e22c344f336fc11824d" }
+version = "1.15.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -3085,6 +3085,10 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "wait-for2", marker = "python_full_version < '3.12'" },
     { name = "websockets" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/43/2582a64574f600c1371a19238c4f3d79123eb21ee5a9df8d3c846b928fec/pipecat_ai-1.15.0.tar.gz", hash = "sha256:c058dab4ad01165184795122e4078b207ad600cdb463122f4d4b6fadadc23b8f", size = 13043384, upload-time = "2026-10-29T05:50:41.856Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/9f/e9bac295d146f07d93943dc385a6ba9b299ce2f54081749361fc243e0839/pipecat_ai-1.15.0-py3-none-any.whl", hash = "sha256:e3c004bef6003567f4b20d098bce5129c1f17554ac44aabad3f7755d613d8815", size = 12230944, upload-time = "2026-10-29T05:50:38.647Z" },
 ]
 
 [package.optional-dependencies]
@@ -3955,14 +3959,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pipecat-ai", extras = ["baseten", "cartesia", "daily", "deepgram", "elevenlabs", "openai", "runner", "tone", "webrtc"], git = "https://github.com/pipecat-ai/pipecat.git?branch=main" },
+    { name = "pipecat-ai", extras = ["baseten", "cartesia", "daily", "deepgram", "elevenlabs", "openai", "runner", "tone", "webrtc"], specifier = ">=1.15.0" },
     { name = "pipecatcloud", specifier = ">=1.2.0" },
     { name = "typesafe-sdk", specifier = ">=0.7.5" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pipecat-ai", extras = ["cli"], git = "https://github.com/pipecat-ai/pipecat.git?branch=main" },
+    { name = "pipecat-ai", extras = ["cli"] },
     { name = "pyright", specifier = ">=1.1.404,<2" },
     { name = "ruff", specifier = ">=0.12.11,<1" },
 ]

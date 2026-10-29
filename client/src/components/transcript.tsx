@@ -10,11 +10,14 @@ import { Panel } from "@/components/panel"
 import { Readings } from "@/components/readings"
 import { TaggedLine } from "@/components/tagged-line"
 import { Switch } from "@/components/ui/switch"
+import { isDemo, USER_NAME } from "@/lib/demo"
 import { partText } from "@/lib/tagged"
 import { cn } from "@/lib/utils"
 import { useExpressionStore } from "@/stores/expression-store"
 
-const EMPTY = "nothing said yet. start a call and ask about an order_"
+const EMPTY = isDemo
+  ? "nothing said yet. start the call to hear the demo caller_"
+  : "nothing said yet. start a call and ask about an order_"
 const BOT_NAME = "sam"
 /** The header switch: shows or hides the reader and tagger rows under the bubbles. */
 const TONE_LABEL = "show tone"
@@ -50,7 +53,7 @@ function Bubble({
     <div className={cn("flex max-w-5/6 flex-col gap-1", user && "items-end")}>
       <p className="readout-label px-1">
         <span className={user ? "text-client" : "text-agent"}>
-          {user ? "you" : BOT_NAME}
+          {user ? USER_NAME : BOT_NAME}
         </span>
         {backchannel && ` · ${BACKCHANNEL_LABEL}`}
         {` · ${shortTime(message.createdAt)}`}

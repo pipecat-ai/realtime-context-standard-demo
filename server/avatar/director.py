@@ -34,7 +34,7 @@ class AvatarDirector(FrameProcessor):
     Goes after the TTS, which pushes each sentence it is about to speak as an
     ``AggregatedTextFrame``. Jev reads each sentence with the reply before it and
     the customer's last message, and picks the expression and the reaction; an
-    expression sound the tagger wrote (``[[laughs]]``) is its reaction alone. The
+    expression sound the tagger wrote (``[[laugh]]``) is its reaction alone. The
     cue goes to the client as an RTVI server-message keyed by the frame's id, the
     ``segment_id`` RTVI's ``bot-output`` reports as each word plays, so the client
     plays it with the line however early it arrives.

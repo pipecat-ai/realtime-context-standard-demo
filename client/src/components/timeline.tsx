@@ -1,8 +1,8 @@
 import { DuplexTimeline } from "@/components/pipecat/duplex-timeline"
+import { demoCaller, USER_NAME } from "@/lib/demo"
 
 /** As the transcript names them. */
 const AGENT_LABEL = "sam"
-const USER_LABEL = "you"
 
 /**
  * Both voices on one clock: who spoke when, the backchannels, where the
@@ -15,7 +15,9 @@ export function Timeline({ className }: { className?: string }) {
       <DuplexTimeline
         noLegend
         agentLabel={AGENT_LABEL}
-        userLabel={USER_LABEL}
+        userLabel={USER_NAME}
+        // A demo's caller is the bot's, not the mic.
+        userTrack={demoCaller?.track}
         agentColor="--agent"
         userColor="--client"
       />

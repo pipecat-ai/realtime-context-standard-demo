@@ -1,14 +1,22 @@
-import { PipecatClientProvider } from "@pipecat-ai/client-react"
-import { useShallow } from "zustand/react/shallow"
+import { RTVIEvent } from "@pipecat-ai/client-js"
+import {
+  PipecatClientProvider,
+  usePipecatClientTransportState,
+  useRTVIClientEvent,
+} from "@pipecat-ai/client-react"
+import { useEffect, useState } from "react"
 
+import { ModeDialog } from "@/components/mode-dialog"
 import { BotAudioOutput } from "@/components/pipecat/bot-audio"
 import { SidePanel } from "@/components/side-panel"
 import { Stage } from "@/components/stage"
 import { Timeline } from "@/components/timeline"
 import { useExpressionEvents } from "@/hooks/use-expression-events"
 import { usePipecatApp } from "@/hooks/use-pipecat-app"
+import { demoCaller, isDemo } from "@/lib/demo"
 import { sessionOptions } from "@/lib/session-config"
-import { useSessionStore } from "@/stores/session-store"
+import { lipsync } from "@/stores/avatar-store"
+import { useSessionStore, type Mode } from "@/stores/session-store"
 
 /**
  * Below lg, the rest of the screen under the stage. Beside it, the panel
@@ -33,6 +41,28 @@ interface SessionProps {
  */
 function Session(props: SessionProps) {
   useExpressionEvents()
+  const { connect } = props
+  const transportState = usePipecatClientTransportState()
+  const setMode = useSessionStore((state) => state.setMode)
+  // Outside a demo, the call's mode is picked on landing.
+  const [choosing, setChoosing] = useState(!isDemo)
+
+  const pick = (mode: Mode) => {
+    setMode(mode)
+    setChoosing(false)
+    // In the tap, as the call button does. The client may still be waiting
+    // on the mic, and then the call button starts the call.
+    if (transportState !== "initialized") return
+    lipsync.resume()
+    void connect()
+  }
+
+  // A demo starts itself where the browser lets it play without a tap.
+  useEffect(() => {
+    if (!demoCaller?.unlocked) return
+    lipsync.resume()
+    void connect()
+  }, [connect])
 
   return (
     <div className="flex h-dvh flex-col lg:flex-row">
@@ -43,21 +73,20 @@ function Session(props: SessionProps) {
         <Timeline className="shrink-0 max-sm:-mt-3 max-sm:px-3" />
       </div>
       <SidePanel className={SIDE_PANEL} />
+      <ModeDialog open={choosing} onPick={pick} />
+      {demoCaller && <DemoCallerAudio />}
     </div>
   )
 }
 
+/** Plays a demo's caller, whose audio the bot sends as it goes. */
+function DemoCallerAudio() {
+  useRTVIClientEvent(RTVIEvent.ServerMessage, demoCaller?.onServerMessage)
+  return null
+}
+
 export function App() {
-  const { tts, useTagger, detectBackchannels } = useSessionStore(
-    useShallow(({ tts, useTagger, detectBackchannels }) => ({
-      tts,
-      useTagger,
-      detectBackchannels,
-    }))
-  )
-  const { client, connect, disconnect, error } = usePipecatApp(
-    sessionOptions(tts, useTagger, detectBackchannels)
-  )
+  const { client, connect, disconnect, error } = usePipecatApp(sessionOptions())
 
   if (!client) {
     return (
