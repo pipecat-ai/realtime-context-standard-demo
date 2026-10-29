@@ -151,7 +151,7 @@ and latency.
 The avatar uses:
 
 - Avatar from Pipecat Character Studio (coming soon!)
-- Lipsync via Pipecat Visemes
+- Lipsync via [Pipecat Visemes](https://github.com/jptaylor/pipecat-visemes)
 - Expressions, gestures and listening reactions via [Jev](https://docs.typesafe.ai)
 
 Under each user line are the Tone reader's emotion and sarcasm; under
