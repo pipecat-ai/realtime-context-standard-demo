@@ -1576,7 +1576,9 @@ function highlightCarrier(rest3, upper, lower, thickness, jaw, corners = null) {
 // expression's corners and `turn` of the way speech turns them.
 // Rounding lips tuck it in: from `tuckFrom` to `tuckTo` it gives way to the carry, which folds the corners into the
 // sides of an O. The opening is carried with it, so the lips' inner edges stay on the cavity's.
-var CORNER_PIECE = { reach: 0.16, turn: 0.5, tuckFrom: 0.5, tuckTo: 0.95 };
+// The drawing (the seam's paths that reach a corner) dims by `dim` while she talks or the lips part, and fades out as
+// they round from `fadeFrom` to `fadeTo`; a gasp's O has no corners, so it tucks the piece in and takes the drawing.
+var CORNER_PIECE = { reach: 0.16, turn: 0.5, tuckFrom: 0.5, tuckTo: 0.95, dim: 0.5, fadeFrom: 0.55, fadeTo: 0.85 };
 var turnBetween = (from, to) => {
   const d = (to - from) % (2 * Math.PI);
   return d > Math.PI ? d - 2 * Math.PI : d < -Math.PI ? d + 2 * Math.PI : d;
@@ -1588,9 +1590,9 @@ function cornerAngle({ upper, lower }, t) {
   return Math.atan2(u[1] / nu + l[1] / nl, u[0] / nu + l[0] / nl);
 }
 /** `open` is the contour drawn, `shut` the same mouth with speech's openness and hold taken out. */
-function cornerPieces(rest3, open, shut, rounding) {
+function cornerPieces(rest3, open, shut, rounding, gasp = 0) {
   const { reach, turn, tuckFrom, tuckTo } = CORNER_PIECE;
-  const hold = 1 - smooth6((rounding - tuckFrom) / (tuckTo - tuckFrom));
+  const hold = (1 - smooth6((rounding - tuckFrom) / (tuckTo - tuckFrom))) * (1 - gasp);
   const ends = [0, 1].map((t) => {
     const from = mouthCurvePoint(rest3, t);
     const to = mouthCurvePoint(open.upper, t);
@@ -1607,6 +1609,19 @@ function cornerPieces(rest3, open, shut, rounding) {
     const held = [to[0] + dx * cos - dy * sin, to[1] + dx * sin + dy * cos];
     return [carried[0] + (held[0] - carried[0]) * w, carried[1] + (held[1] - carried[1]) * w];
   };
+}
+/** How much of the corners' drawing shows for `mouth` (lipsMouth's), the lips' rounding and how far she's talking. */
+function cornerOpacity(rest3, mouth, rounding, talking) {
+  const { dim, fadeFrom, fadeTo } = CORNER_PIECE;
+  const speaking = Math.max(smooth6(mouth.opening / (0.27 * rest3.halfWidth)), clamp(talking));
+  return (1 - dim * speaking) * (1 - smooth6((rounding - fadeFrom) / (fadeTo - fadeFrom))) * (1 - mouth.gasp);
+}
+/** The seam's paths that reach a corner of `rest3`: the drawing at each corner, which cornerOpacity fades. */
+function cornerDrawing(rest3, paths) {
+  const near = 0.1 * rest3.halfWidth;
+  const ends = [[rest3.cx - rest3.halfWidth, rest3.leftY], [rest3.cx + rest3.halfWidth, rest3.rightY]];
+  const reaches = (cmds) => cmds.some(({ p }) => p && ends.some(([x, y]) => Math.hypot(p[0] - x, p[1] - y) < near));
+  return [...paths].filter(([, { role, cmds }]) => role === "seam" && reaches(cmds)).map(([el]) => el);
 }
 /** The opening under corner pieces: the contour carried as the seam is, so the lips' inner edges stay on it. */
 function cornerCavity(seam, upper, lower, corners, jaw, pieces = 48) {
@@ -1626,7 +1641,7 @@ function lipsMouthPose(spec, articulation, owner, pose = POSE_REST, tune = DRAWN
   const seam = restCurve(rest3);
   const { upper, lower } = contourCurves(mouth);
   const shut = contourCurves(lipsMouth(rest3, spec.params.open, { ...a, openness: 0 }, "lip-aware", pose, owner, tune));
-  const corners = cornerPieces(seam, { upper, lower }, shut, a.rounding);
+  const corners = cornerPieces(seam, { upper, lower }, shut, a.rounding, mouth.gasp);
   const interior = { cavity: cornerCavity(seam, upper, lower, corners, jaw) };
   const inside = mouthInside(mouth, a, spec.lipWidth, jaw);
   if (inside && spec.params.teeth && mouth.gasp < 1) {
@@ -1658,7 +1673,8 @@ function lipsMouthPose(spec, articulation, owner, pose = POSE_REST, tune = DRAWN
     "lip-highlight": 1 - smooth6(mouth.opening / (0.27 * rest3.halfWidth)),
     "lip-shadow": 1 - smooth6(mouth.opening / (14 / COCO_HALF_WIDTH * rest3.halfWidth))
   };
-  return { open: true, hide: [...spec.hideWhileOpen], interior, transforms, deform, opacity };
+  const corner = cornerOpacity(rest3, mouth, a.rounding, talking);
+  return { open: true, hide: [...spec.hideWhileOpen], interior, transforms, deform, opacity, cornerOpacity: corner };
 }
 
 // src/core/face/mouths/index.ts
@@ -3536,6 +3552,8 @@ var MouthRig = class {
     __publicField(this, "roles", /* @__PURE__ */ new Map());
     /** Each path's original data in the sub-role groups, parsed at bind; split for the deformer at its first carry. */
     __publicField(this, "paths", /* @__PURE__ */ new Map());
+    /** realtime-context-standard-demo: the drawing at the mouth's corners (cornerDrawing), which a pose's cornerOpacity fades. */
+    __publicField(this, "corners", []);
     /** The carryable gradients the sub-roles' paths are painted with, by id, and each path's use of one. */
     __publicField(this, "gradients", /* @__PURE__ */ new Map());
     __publicField(this, "uses", []);
@@ -3563,6 +3581,7 @@ var MouthRig = class {
         }
       }
     }
+    if (spec.rest) this.corners = cornerDrawing(spec.rest, this.paths);
     const key = idPart(spec.layer);
     this.ids = { cavity: `${prefix}${key}-mouth-cavity`, tongue: `${prefix}${key}-mouth-tongue` };
     this.bindGradients(root, index, `${prefix}${key}-mouth-gradient-`);
@@ -3618,6 +3637,12 @@ var MouthRig = class {
       for (const el of this.roles.get(role) ?? []) {
         const own = Number(w.own(el, "opacity") ?? "1");
         w.set(el, "opacity", fmt((Number.isFinite(own) ? own : 1) * v, 3));
+      }
+    }
+    if (pose.cornerOpacity < 1) {
+      for (const el of this.corners) {
+        const own = Number(w.own(el, "opacity") ?? "1");
+        w.set(el, "opacity", fmt((Number.isFinite(own) ? own : 1) * Math.max(0, pose.cornerOpacity), 3));
       }
     }
     const deform = pose.deform ?? {};
