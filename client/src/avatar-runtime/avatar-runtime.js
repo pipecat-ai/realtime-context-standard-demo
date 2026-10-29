@@ -1572,8 +1572,8 @@ function highlightCarrier(rest3, upper, lower, thickness, jaw, corners = null) {
 }
 // realtime-context-standard-demo: the drawing at each corner of the mouth (a smile's curl) carried whole, so it rides
 // the corner as the mouth opens rather than folding into the opening and back out at every syllable. Not in the
-// creator's export: client/scripts/use-avatar.sh applies it to each new one. The piece reaches `reach` along the rest
-// seam, easing into the lips' carry, and turns with the expression's corners and `turn` of the way speech turns them.
+// creator's export. The piece reaches `reach` along the rest seam, easing into the lips' carry, and turns with the
+// expression's corners and `turn` of the way speech turns them.
 // Rounding lips tuck it in: from `tuckFrom` to `tuckTo` it gives way to the carry, which folds the corners into the
 // sides of an O. The opening is carried with it, so the lips' inner edges stay on the cavity's.
 var CORNER_PIECE = { reach: 0.16, turn: 0.5, tuckFrom: 0.5, tuckTo: 0.95 };
@@ -2691,7 +2691,7 @@ var sanitize = (a) => ({
 });
 var atRest = (a) => Math.abs(a.openness - REST_ARTICULATION.openness) <= OWNER_EPSILON && Math.abs(a.width - REST_ARTICULATION.width) <= OWNER_EPSILON && Math.abs(a.rounding - REST_ARTICULATION.rounding) <= OWNER_EPSILON && Math.abs(a.energy - REST_ARTICULATION.energy) <= OWNER_EPSILON;
 // realtime-context-standard-demo: the speech's own acting (SpeechSample.gesture), from the host. Not in the creator's
-// export: client/scripts/use-avatar.sh applies it to each new one.
+// export.
 var GESTURE_MOUTH_KEYS = /* @__PURE__ */ new Set(["smile", "smirk", "restOpen"]);
 function gestured(pose, gesture, amount) {
   if (!gesture) return pose;

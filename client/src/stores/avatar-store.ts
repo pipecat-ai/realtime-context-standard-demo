@@ -8,8 +8,7 @@ import { createSpeechTrack } from "@/lib/speech-track"
 
 /**
  * Sam's face: Momo, a Pipecat Character Studio export served from
- * public/avatar/ (scripts/use-avatar.sh). The store keeps her expression and
- * speech across mounts.
+ * public/avatar/. The store keeps her expression and speech across mounts.
  */
 export const useAvatarStore = createAvatarStore({ src: "/avatar/" })
 
