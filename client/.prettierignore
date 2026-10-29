@@ -11,3 +11,7 @@ src/hooks/use-pipecat-*.ts
 src/lib/transports.ts
 src/lib/visualizer.ts
 src/lib/utils.ts
+
+# The avatar, as Pipecat Character Studio exports it (scripts/use-avatar.sh).
+public/avatar
+src/avatar-runtime

@@ -1,4 +1,5 @@
 import type { UsePipecatAppOptions } from "@/hooks/use-pipecat-app"
+import { lipsync } from "@/stores/avatar-store"
 import type { TtsChoice } from "@/stores/session-store"
 
 /** Must match the start endpoint, which reads the same variable. */
@@ -33,6 +34,7 @@ export function sessionOptions(
         detect_backchannels: String(detectBackchannels),
       },
     },
+    clientOptions: { callbacks: lipsync.callbacks },
     initDevicesOnMount: true,
   }
 }

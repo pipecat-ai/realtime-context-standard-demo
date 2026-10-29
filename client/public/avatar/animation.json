@@ -1,0 +1,1240 @@
+{
+  "format": "creator-animation",
+  "version": 1,
+  "expressions": [
+    {
+      "id": "neutral",
+      "name": "Neutral",
+      "gloss": "Calm and attentive: the character as drawn, breathing, glancing about now and then.",
+      "icon": "meh",
+      "pose": {},
+      "idle": {
+        "cycle": 14.4,
+        "breathing": 1,
+        "sway": 1,
+        "tempo": 1,
+        "looks": [
+          { "at": 1.35, "hold": 1.05, "x": -7, "y": 0, "tilt": -1 },
+          { "at": 6.2, "hold": 1.45, "x": 8, "y": -2, "tilt": 1.4 },
+          { "at": 10.9, "hold": 0.7, "x": -3, "y": 2, "chin": 1.8 }
+        ],
+        "gestures": [{ "at": 9.2, "duration": 1.1, "angle": -1.4, "y": 2.2 }]
+      },
+      "effects": ["motion-strokes"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "happy",
+      "name": "Happy",
+      "gloss": "A warm smile: the head tilts back a little, the brows lift and the eyes smile.",
+      "icon": "smile",
+      "pose": {
+        "headAngle": -5,
+        "headY": -3,
+        "browLeft": -4,
+        "browRight": -4,
+        "eyeLeft": 0.8,
+        "eyeRight": 0.8,
+        "eyeSmile": 4,
+        "smile": 12,
+        "cheek": 4
+      },
+      "idle": {
+        "cycle": 13.6,
+        "breathing": 1.15,
+        "sway": 1.4,
+        "tempo": 1.1,
+        "looks": [
+          { "at": 1.8, "hold": 1.3, "x": 7, "y": -1, "tilt": 2.4 },
+          { "at": 8.2, "hold": 1.1, "x": -7, "y": -2, "tilt": -1.8 }
+        ],
+        "gestures": [
+          { "at": 4.2, "duration": 0.6, "y": 4, "chest": -1.5 },
+          { "at": 4.85, "duration": 0.85, "angle": -2, "y": 2.8, "chest": -1 },
+          { "at": 11.3, "duration": 1, "angle": 2, "y": -3, "chest": 1.5 }
+        ]
+      },
+      "effects": ["joy-marks"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "excited",
+      "name": "Excited",
+      "gloss": "Bright and eager: chin up, chest out, brows high, eyes wide and the mouth open in a grin.",
+      "icon": "party-popper",
+      "pose": {
+        "headY": -11,
+        "chest": 6,
+        "browLeft": -14,
+        "browRight": -14,
+        "eyeLeft": 1.17,
+        "eyeRight": 1.17,
+        "gazeY": -1,
+        "smile": 13,
+        "cheek": 5,
+        "restOpen": 10
+      },
+      "idle": {
+        "cycle": 12.8,
+        "breathing": 1.25,
+        "sway": 1.6,
+        "tempo": 1.45,
+        "looks": [
+          { "at": 0.95, "hold": 0.75, "x": 8, "y": -3, "tilt": 2, "chin": -2 },
+          { "at": 4.4, "hold": 0.8, "x": -8, "y": -2, "tilt": -2, "chin": -1 },
+          { "at": 9.1, "hold": 0.9, "x": 6, "y": -4, "tilt": 1, "chin": -2 }
+        ],
+        "gestures": [
+          { "at": 2.75, "duration": 0.6, "angle": -2, "y": -6, "chest": 3 },
+          { "at": 3.4, "duration": 0.5, "angle": 1, "y": -3.5, "chest": 1.8 },
+          { "at": 6.7, "duration": 0.68, "angle": 2.5, "y": -5, "chest": 2.4 },
+          { "at": 7.5, "duration": 0.52, "y": -2.5, "chest": 1.2 }
+        ]
+      },
+      "effects": ["sparkles"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "thinking",
+      "name": "Thinking",
+      "gloss": "Weighing it up: the head tilts, one brow climbs, the eyes look up and away, a wry mouth.",
+      "icon": "brain",
+      "pose": {
+        "headAngle": 10,
+        "headX": 3,
+        "browLeft": -13,
+        "browRight": 4,
+        "browAngleLeft": -3,
+        "browAngleRight": 7,
+        "eyeLeft": 1.03,
+        "eyeRight": 0.65,
+        "gazeX": 6,
+        "gazeY": -3,
+        "smile": -1,
+        "smirk": 3
+      },
+      "idle": {
+        "cycle": 15.2,
+        "breathing": 0.85,
+        "sway": 0.75,
+        "tempo": 0.8,
+        "looks": [
+          { "at": 1.1, "hold": 2.1, "x": -4, "y": -4, "tilt": 3, "chin": -2 },
+          { "at": 6.1, "hold": 1.75, "x": -11, "y": -1, "tilt": -3.5, "chin": 1 },
+          { "at": 11.6, "hold": 1.2, "x": 2, "y": -3, "tilt": 2, "chin": -2 }
+        ],
+        "gestures": [
+          { "at": 4.35, "duration": 1.3, "angle": -2.2, "y": 3 },
+          { "at": 9.5, "duration": 1.4, "angle": 2, "y": -2.5 }
+        ]
+      },
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "scheming",
+      "name": "Scheming",
+      "gloss": "A plan afoot: chin down, a sly sideways look through narrowed eyes, a crooked smile.",
+      "icon": "venetian-mask",
+      "pose": {
+        "headAngle": -7,
+        "headY": 4,
+        "browLeft": 3,
+        "browRight": -4,
+        "browAngleLeft": 9,
+        "browAngleRight": 2,
+        "eyeLeft": 0.56,
+        "eyeRight": 0.64,
+        "gazeX": -5,
+        "gazeY": 1,
+        "smile": 6,
+        "smirk": 8,
+        "cheek": 2
+      },
+      "idle": {
+        "cycle": 14.8,
+        "breathing": 0.75,
+        "sway": 0.8,
+        "tempo": 0.85,
+        "looks": [
+          { "at": 1.1, "hold": 1.45, "x": 11, "y": 0, "tilt": 1.5, "chin": 1 },
+          { "at": 4.6, "hold": 1.4, "x": -3, "y": -1, "tilt": -2, "chin": 2 },
+          { "at": 9.9, "hold": 1.7, "x": 9, "y": -2, "tilt": 2, "chin": -1 }
+        ],
+        "gestures": [
+          { "at": 7.5, "duration": 1.5, "angle": -3.5, "y": -2 },
+          { "at": 12.9, "duration": 0.8, "angle": 1.2, "y": 2 }
+        ]
+      },
+      "effects": ["gleam"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "angry",
+      "name": "Angry",
+      "gloss": "Cross: the head lowers, the brows knit down at the middle, the eyes narrow and the mouth turns down.",
+      "icon": "angry",
+      "pose": {
+        "headY": 6,
+        "chest": 4,
+        "browLeft": 5,
+        "browRight": 5,
+        "browAngleLeft": 15,
+        "browAngleRight": -15,
+        "eyeLeft": 0.68,
+        "eyeRight": 0.68,
+        "gazeY": 1,
+        "smile": -9,
+        "cheek": -2
+      },
+      "idle": {
+        "cycle": 13.8,
+        "breathing": 1.45,
+        "sway": 0.55,
+        "tempo": 1.15,
+        "looks": [
+          { "at": 1.8, "hold": 1.25, "x": -7, "y": 0, "tilt": -1.5, "chin": 1.5 },
+          { "at": 7.9, "hold": 1.2, "x": 7, "y": -1, "tilt": 1.2, "chin": 1 }
+        ],
+        "gestures": [
+          { "at": 4.5, "duration": 0.52, "angle": -3.5, "y": 1 },
+          { "at": 4.94, "duration": 0.58, "angle": 3, "y": 1 },
+          { "at": 5.47, "duration": 0.6, "angle": -1.4 },
+          { "at": 11, "duration": 1, "y": -3.2, "chest": 2.2 }
+        ]
+      },
+      "effects": ["anger-mark", "flush"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "upset",
+      "name": "Upset",
+      "gloss": "Sad and low: the head droops, the brows rise in the middle, the eyes lower and the mouth turns down.",
+      "icon": "frown",
+      "pose": {
+        "headAngle": 6,
+        "headY": 10,
+        "chest": -4,
+        "browLeft": -2,
+        "browRight": -2,
+        "browAngleLeft": -14,
+        "browAngleRight": 14,
+        "eyeLeft": 0.72,
+        "eyeRight": 0.72,
+        "gazeY": 5,
+        "smile": -10,
+        "cheek": -2
+      },
+      "idle": {
+        "cycle": 15.6,
+        "breathing": 1.25,
+        "sway": 0.7,
+        "tempo": 0.65,
+        "looks": [
+          { "at": 1.5, "hold": 2, "x": -5, "y": 1, "tilt": -2, "chin": 3 },
+          { "at": 7.1, "hold": 1.3, "x": 4, "y": -5, "tilt": 1, "chin": -2 },
+          { "at": 11.4, "hold": 1.7, "x": -3, "y": 1, "tilt": -1.5, "chin": 2.5 }
+        ],
+        "gestures": [{ "at": 4.8, "duration": 1.8, "angle": -1, "y": 3.5, "chest": -2.2 }]
+      },
+      "effects": ["sweat-drop"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "win",
+      "name": "Win",
+      "gloss": "Triumphant: the head up and back, chest out, a beaming open smile.",
+      "icon": "trophy",
+      "pose": {
+        "headAngle": -3,
+        "headY": -9,
+        "chest": 7,
+        "browLeft": -6,
+        "browRight": -9,
+        "browAngleLeft": -3,
+        "eyeLeft": 0.86,
+        "eyeRight": 0.86,
+        "eyeSmile": 6,
+        "smile": 17,
+        "cheek": 6,
+        "restOpen": 10
+      },
+      "idle": {
+        "cycle": 13.2,
+        "breathing": 1.2,
+        "sway": 1.1,
+        "tempo": 1.15,
+        "looks": [
+          { "at": 1.3, "hold": 1, "x": 5, "y": -2, "tilt": 1.5, "chin": -1 },
+          { "at": 7.4, "hold": 1.2, "x": -5, "y": -1, "tilt": -0.5, "chin": -0.5 }
+        ],
+        "gestures": [
+          { "at": 3.15, "duration": 0.55, "angle": -1.2, "y": -4.2, "chest": 3 },
+          { "at": 3.85, "duration": 0.8, "angle": 2, "y": -2.2, "chest": 1.5 },
+          { "at": 10.1, "duration": 0.9, "angle": -1.5, "y": -3, "chest": 2 }
+        ]
+      },
+      "effects": ["victory-burst"],
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "lose",
+      "name": "Lose",
+      "gloss": "Defeated: the head sinks, the shoulders drop, the brows slope and the eyes look down.",
+      "icon": "cloud-rain",
+      "pose": {
+        "headAngle": 5,
+        "headY": 20,
+        "chest": -10,
+        "browLeft": -4,
+        "browRight": -4,
+        "browAngleLeft": -20,
+        "browAngleRight": 20,
+        "eyeLeft": 0.55,
+        "eyeRight": 0.58,
+        "gazeY": 6,
+        "smile": -14,
+        "cheek": -3
+      },
+      "idle": {
+        "cycle": 16.8,
+        "breathing": 1.15,
+        "sway": 0.45,
+        "tempo": 0.6,
+        "looks": [
+          { "at": 1.5, "hold": 2, "x": -4, "y": 1, "tilt": -1.5, "chin": 2.5 },
+          { "at": 7.8, "hold": 1.2, "x": 4, "y": -5, "tilt": 1, "chin": -1 },
+          { "at": 12.2, "hold": 1.8, "x": -3, "y": 0, "tilt": -1.2, "chin": 2 }
+        ],
+        "gestures": [
+          { "at": 4.8, "duration": 2.2, "angle": -1.4, "y": 4, "chest": -3 },
+          { "at": 10.3, "duration": 1.65, "y": 2.5, "chest": -1.8 }
+        ]
+      },
+      "effects": ["gloom-wisps", "gloom"],
+      "source": { "kind": "builtin" }
+    }
+  ],
+  "reactions": [
+    {
+      "id": "laugh",
+      "name": "Laugh",
+      "gloss": "Three chuckles: the eyes squeeze shut, the mouth opens in a grin and the head bobs back with each one.",
+      "icon": "laugh",
+      "duration": 3.4,
+      "enter": 0.24,
+      "release": 2.8,
+      "pose": {
+        "headAngle": -5,
+        "headY": -3,
+        "chest": 4,
+        "browLeft": -5,
+        "browRight": -5,
+        "eyeLeft": 0,
+        "eyeRight": 0,
+        "eyeSmile": 8,
+        "smile": 18,
+        "cheek": 7,
+        "restOpen": 12
+      },
+      "tracks": {
+        "pose": {
+          "restOpen": [
+            { "at": 0.55, "for": 0.38, "amount": 6 },
+            { "at": 1.2, "for": 0.44, "amount": 6 },
+            { "at": 1.9, "for": 0.52, "amount": 6 }
+          ]
+        },
+        "motion": {
+          "headAngle": [
+            { "at": 0.55, "for": 0.38, "amount": -1.2 },
+            { "at": 1.2, "for": 0.44, "amount": 1.1 },
+            { "at": 1.9, "for": 0.52, "amount": -0.6 }
+          ],
+          "headY": [
+            { "at": 0.55, "for": 0.38, "amount": -3.2 },
+            { "at": 1.2, "for": 0.44, "amount": -3.2 },
+            { "at": 1.9, "for": 0.52, "amount": -3.2 }
+          ],
+          "chest": [
+            { "at": 0.55, "for": 0.38, "amount": 3.6 },
+            { "at": 1.2, "for": 0.44, "amount": 3.6 },
+            { "at": 1.9, "for": 0.52, "amount": 3.6 }
+          ],
+          "hair": [
+            { "at": 0.67, "for": 0.5, "amount": -0.25 },
+            { "at": 1.34, "for": 0.54, "amount": -0.25 },
+            { "at": 2.07, "for": 0.62, "amount": -0.25 }
+          ],
+          "rearHair": [
+            { "at": 0.67, "for": 0.5, "amount": -0.35 },
+            { "at": 1.34, "for": 0.54, "amount": -0.35 },
+            { "at": 2.07, "for": 0.62, "amount": -0.35 }
+          ],
+          "scarf": [
+            { "at": 0.67, "for": 0.5, "amount": 0.18 },
+            { "at": 1.34, "for": 0.54, "amount": 0.18 },
+            { "at": 2.07, "for": 0.62, "amount": 0.18 }
+          ],
+          "scarfBounce": [
+            { "at": 0.67, "for": 0.5, "amount": 0.55 },
+            { "at": 1.34, "for": 0.54, "amount": 0.55 },
+            { "at": 2.07, "for": 0.62, "amount": 0.55 }
+          ]
+        }
+      },
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "nod",
+      "name": "Nod",
+      "gloss": "Yes: two nods, the second smaller, with a friendly look and a small smile.",
+      "icon": "check",
+      "duration": 1.7,
+      "enter": 0.14,
+      "release": 1.25,
+      "pose": { "headY": 1, "browLeft": -2, "browRight": -2, "eyeSmile": 1.5, "smile": 4 },
+      "tracks": {
+        "pose": {
+          "eyeLeft": [
+            { "at": 0.12, "for": 0.42, "amount": -0.22 },
+            { "at": 0.58, "for": 0.4, "amount": -0.18 }
+          ],
+          "eyeRight": [
+            { "at": 0.12, "for": 0.42, "amount": -0.22 },
+            { "at": 0.58, "for": 0.4, "amount": -0.18 }
+          ]
+        },
+        "motion": {
+          "headY": [
+            { "at": 0.1, "for": 0.42, "amount": 13.5 },
+            { "at": 0.56, "for": 0.4, "amount": 10 }
+          ],
+          "headAngle": [
+            { "at": 0.1, "for": 0.42, "amount": 1.35 },
+            { "at": 0.56, "for": 0.4, "amount": 0.9 }
+          ],
+          "chest": [
+            { "at": 0.14, "for": 0.42, "amount": -1.8 },
+            { "at": 0.6, "for": 0.4, "amount": -1.35 }
+          ],
+          "hair": [
+            { "at": 0.24, "for": 0.5, "amount": 0.45 },
+            { "at": 0.7, "for": 0.48, "amount": 0.34 }
+          ],
+          "scarfBounce": [
+            { "at": 0.28, "for": 0.6, "amount": 0.68 },
+            { "at": 0.74, "for": 0.56, "amount": 0.5 }
+          ]
+        }
+      },
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "shake",
+      "name": "Shake",
+      "gloss": "No: the head turns side to side three times, the eyes shut, the brows down and the mouth flat.",
+      "icon": "x",
+      "duration": 1.8,
+      "enter": 0.14,
+      "release": 1.3,
+      "pose": {
+        "headY": 1,
+        "browLeft": 2,
+        "browRight": 2,
+        "browAngleLeft": 3,
+        "browAngleRight": -3,
+        "eyeLeft": 0,
+        "eyeRight": 0,
+        "smile": -3
+      },
+      "tracks": {
+        "motion": {
+          "headX": [
+            { "at": 0.1, "for": 0.34, "amount": -9 },
+            { "at": 0.38, "for": 0.36, "amount": 9 },
+            { "at": 0.68, "for": 0.36, "amount": -6.75 },
+            { "at": 0.98, "for": 0.36, "amount": 2.7 }
+          ],
+          "headAngle": [
+            { "at": 0.1, "for": 0.34, "amount": -3.6 },
+            { "at": 0.38, "for": 0.36, "amount": 3.6 },
+            { "at": 0.68, "for": 0.36, "amount": -2.7 },
+            { "at": 0.98, "for": 0.36, "amount": 1.1 }
+          ],
+          "hair": [
+            { "at": 0.2, "for": 0.4, "amount": 0.68 },
+            { "at": 0.48, "for": 0.42, "amount": -0.68 },
+            { "at": 0.78, "for": 0.42, "amount": 0.5 }
+          ],
+          "rearHair": [
+            { "at": 0.24, "for": 0.44, "amount": 0.56 },
+            { "at": 0.52, "for": 0.46, "amount": -0.56 },
+            { "at": 0.82, "for": 0.46, "amount": 0.4 }
+          ],
+          "scarf": [
+            { "at": 0.26, "for": 0.5, "amount": 0.45 },
+            { "at": 0.56, "for": 0.5, "amount": -0.45 },
+            { "at": 0.86, "for": 0.5, "amount": 0.32 }
+          ]
+        }
+      },
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "shocked",
+      "name": "Shocked",
+      "gloss": "A startle: the eyes fly wide, the brows shoot up, the mouth drops open and the head jerks back, then settles.",
+      "icon": "zap",
+      "duration": 3.4,
+      "enter": 0.24,
+      "release": 2.8,
+      "pose": {
+        "headAngle": 2,
+        "headY": -4,
+        "chest": 4,
+        "browLeft": -16,
+        "browRight": -16,
+        "eyeLeft": 1.24,
+        "eyeRight": 1.24,
+        "smile": 0,
+        "cheek": 1,
+        "restOpen": 16
+      },
+      "tracks": {
+        "motion": {
+          "headAngle": [
+            { "at": 0.12, "for": 0.6, "amount": 1.8 },
+            { "at": 1, "for": 0.75, "amount": -0.8 }
+          ],
+          "headY": [
+            { "at": 0.12, "for": 0.6, "amount": -3 },
+            { "at": 1, "for": 0.75, "amount": 1 }
+          ],
+          "chest": [{ "at": 0.12, "for": 0.6, "amount": 2.8 }],
+          "hair": [{ "at": 0.25, "for": 0.65, "amount": -0.35 }],
+          "rearHair": [{ "at": 0.32, "for": 0.75, "amount": -0.4 }],
+          "scarfBounce": [{ "at": 0.32, "for": 0.85, "amount": 0.65 }]
+        }
+      },
+      "startle": true,
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "sigh",
+      "name": "Sigh",
+      "gloss": "A breath in, then a long breath out: the shoulders lift and then slump, the head sinks and tilts into them, the eyes drop and grow heavy, the brows slope and the mouth turns down.",
+      "icon": "wind",
+      "duration": 4.6,
+      "enter": 0.5,
+      "release": 3.6,
+      "pose": {
+        "headY": 3,
+        "chest": -1,
+        "browLeft": -3,
+        "browRight": -3,
+        "browAngleLeft": -24,
+        "browAngleRight": 24,
+        "eyeLeft": 0.6,
+        "eyeRight": 0.6,
+        "gazeY": 7,
+        "smile": -16,
+        "cheek": -3
+      },
+      "tracks": {
+        "pose": {
+          "browLeft": [{ "at": 0, "for": 0.9, "amount": -3 }],
+          "browRight": [{ "at": 0, "for": 0.9, "amount": -3 }],
+          "eyeLeft": [
+            { "at": 0, "for": 0.9, "amount": 0.3 },
+            { "at": 0.8, "for": 1.4, "amount": -0.2 }
+          ],
+          "eyeRight": [
+            { "at": 0, "for": 0.9, "amount": 0.3 },
+            { "at": 0.8, "for": 1.4, "amount": -0.2 }
+          ],
+          "gazeY": [{ "at": 0, "for": 0.9, "amount": -7 }],
+          "restOpen": [
+            { "at": 0.1, "for": 0.7, "amount": 2 },
+            { "at": 0.75, "for": 1.3, "amount": 5 }
+          ]
+        },
+        "motion": {
+          "chest": [{ "at": 0, "for": 1, "amount": 8 }, { "at": 0.55, "for": 4.05, "amount": -10 }],
+          "headY": [{ "at": 0, "for": 1, "amount": -9 }, { "at": 0.5, "for": 4.1, "amount": 15 }],
+          "headAngle": [{ "at": 0.55, "for": 4.05, "amount": 4.5 }],
+          "headX": [{ "at": 0.55, "for": 4.05, "amount": 2 }],
+          "hair": [{ "at": 0.9, "for": 1.2, "amount": 0.3 }],
+          "scarfBounce": [{ "at": 0.8, "for": 1.2, "amount": 0.3 }]
+        }
+      },
+      "source": { "kind": "builtin" }
+    },
+    {
+      "id": "wink",
+      "name": "Wink",
+      "gloss": "A quick wink of the viewer's-left eye, the head flicking towards it and settling tipped, the mouth curling up on that side.",
+      "icon": "eye-closed",
+      "duration": 0.8,
+      "enter": 0.06,
+      "release": 0.46,
+      "pose": {
+        "headAngle": -5,
+        "headX": -1.5,
+        "browLeft": 4,
+        "browRight": -4,
+        "eyeLeft": 0,
+        "eyeRight": 0.92,
+        "eyeSmile": 2,
+        "smile": 7,
+        "smirk": -6
+      },
+      "tracks": {
+        "motion": {
+          "headAngle": [{ "at": 0, "for": 0.24, "amount": -6 }],
+          "headX": [{ "at": 0, "for": 0.24, "amount": -3.5 }],
+          "headY": [{ "at": 0.02, "for": 0.3, "amount": 2 }],
+          "hair": [{ "at": 0.1, "for": 0.45, "amount": 0.25 }]
+        }
+      },
+      "source": { "kind": "builtin" }
+    }
+  ],
+  "glyphs": [
+    {
+      "paths": [
+        {
+          "d": "M 0 -11 C 2 -3 3 -2 10 0 C 3 2 2 3 0 11 C -2 3 -3 2 -10 0 C -3 -2 -2 -3 0 -11 Z",
+          "fill": "particle",
+          "stroke": "#fff0ba",
+          "width": 1.2
+        }
+      ],
+      "wake": 1.8,
+      "id": "sparkle"
+    },
+    {
+      "paths": [
+        {
+          "d": "M -3 -13 Q -3 -3 -13 -3 M 3 -13 Q 3 -3 13 -3 M 13 3 Q 3 3 3 13 M -3 13 Q -3 3 -13 3",
+          "stroke": "#953a35",
+          "width": 6.2
+        },
+        {
+          "d": "M -3 -13 Q -3 -3 -13 -3 M 3 -13 Q 3 -3 13 -3 M 13 3 Q 3 3 3 13 M -3 13 Q -3 3 -13 3",
+          "stroke": "#ed735d",
+          "width": 3.8
+        }
+      ],
+      "wake": 2.8,
+      "id": "anger-mark",
+      "fade": false
+    },
+    {
+      "paths": [
+        {
+          "d": "M 0 -16 C -1 -9 -7 -3 -7 3 C -7 12 7 12 7 3 C 7 -3 1 -9 0 -16 Z",
+          "fill": "#68b9c3",
+          "stroke": "#2d778d",
+          "width": 1.6
+        },
+        { "d": "M -2 -5 C -4 -1 -5 2 -3 4", "stroke": "#d5f5e5", "width": 2.1 }
+      ],
+      "wake": 2.2,
+      "id": "drop"
+    },
+    {
+      "paths": [
+        {
+          "d": "M 0 -3.4 C 1.88 -3.4 3.4 -1.88 3.4 0 C 3.4 1.88 1.88 3.4 0 3.4 C -1.88 3.4 -3.4 1.88 -3.4 0 C -3.4 -1.88 -1.88 -3.4 0 -3.4 Z",
+          "fill": "particle"
+        }
+      ],
+      "wake": 1.4,
+      "id": "pop"
+    }
+  ],
+  "effects": [
+    {
+      "id": "anger-mark",
+      "name": "Anger mark",
+      "gloss": "A cross-popping vein mark flies up beside the head with two hot streaks, once.",
+      "burst": {
+        "duration": 1.05,
+        "particles": [
+          {
+            "glyph": "anger-mark",
+            "color": "#db6a52",
+            "at": [171, -34],
+            "velocity": [23, -24],
+            "gravity": 16,
+            "spin": 22
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -3 -9 Q 3 -2 1 7", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#db6a52",
+            "at": [171, 4],
+            "velocity": [28, 1],
+            "gravity": 19,
+            "spin": 24,
+            "delay": 0.1,
+            "size": 0.8
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 0 3 L 0 -5", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#ed9b6c",
+            "at": [167, -62],
+            "velocity": [18, -27],
+            "gravity": 8,
+            "spin": 34,
+            "delay": 0.14,
+            "size": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "sweat-drop",
+      "name": "Sweat drops",
+      "gloss": "Two sweat drops fly off the side of the head and fall, once.",
+      "burst": {
+        "duration": 1.1,
+        "particles": [
+          {
+            "glyph": "drop",
+            "color": "#6ab4c2",
+            "at": [-170, 20],
+            "velocity": [-20, -10],
+            "gravity": 59,
+            "spin": 18,
+            "size": 1.05
+          },
+          {
+            "glyph": "drop",
+            "color": "#6ab4c2",
+            "at": [-182, 2],
+            "velocity": [-26, -5],
+            "gravity": 45,
+            "spin": -20,
+            "delay": 0.19,
+            "size": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "joy-marks",
+      "name": "Joy marks",
+      "gloss": "Warm curved rays and round peach and gold pops fly out beside each cheek, once.",
+      "burst": {
+        "duration": 0.95,
+        "particles": [
+          {
+            "glyph": {
+              "paths": [{ "d": "M 5 3 Q -1 -1 -4 -8", "stroke": "particle", "width": 3.2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e6a36b",
+            "at": [-168, 9],
+            "velocity": [-23, -30],
+            "gravity": 31,
+            "spin": -20,
+            "size": 1.05
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 5 2 Q -3 0 -8 -2", "stroke": "particle", "width": 3.4 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e8b34e",
+            "at": [-166, 28],
+            "velocity": [-29, -22],
+            "gravity": 30,
+            "spin": -5,
+            "delay": 0.04,
+            "size": 1.12
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 5 -4 Q 0 2 -6 4", "stroke": "particle", "width": 3.2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e6a36b",
+            "at": [-163, 45],
+            "velocity": [-24, -13],
+            "gravity": 28,
+            "spin": 17,
+            "delay": 0.085
+          },
+          {
+            "glyph": "pop",
+            "color": "#edbf63",
+            "at": [-174, -5],
+            "velocity": [-17, -26],
+            "gravity": 42,
+            "delay": 0.12,
+            "size": 0.86
+          },
+          {
+            "glyph": "pop",
+            "color": "#eaa67f",
+            "at": [-168, 62],
+            "velocity": [-20, -33],
+            "gravity": 40,
+            "delay": 0.19,
+            "size": 0.72
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -5 3 Q 1 -1 4 -8", "stroke": "particle", "width": 3.2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e6a36b",
+            "at": [170, 9],
+            "velocity": [23, -30],
+            "gravity": 31,
+            "spin": 20,
+            "delay": 0.055,
+            "size": 1.05
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -5 2 Q 3 0 8 -2", "stroke": "particle", "width": 3.4 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e8b34e",
+            "at": [168, 28],
+            "velocity": [29, -22],
+            "gravity": 30,
+            "spin": 5,
+            "delay": 0.095,
+            "size": 1.12
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -5 -4 Q 0 2 6 4", "stroke": "particle", "width": 3.2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e6a36b",
+            "at": [165, 45],
+            "velocity": [24, -13],
+            "gravity": 28,
+            "spin": -17,
+            "delay": 0.14
+          },
+          {
+            "glyph": "pop",
+            "color": "#edbf63",
+            "at": [176, -5],
+            "velocity": [17, -26],
+            "gravity": 42,
+            "delay": 0.175,
+            "size": 0.86
+          },
+          {
+            "glyph": "pop",
+            "color": "#eaa67f",
+            "at": [170, 62],
+            "velocity": [20, -33],
+            "gravity": 40,
+            "delay": 0.245,
+            "size": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "id": "sparkles",
+      "name": "Sparkles",
+      "gloss": "Gold four-point stars and two curved strokes fly out beside the head, once.",
+      "burst": {
+        "duration": 1,
+        "particles": [
+          {
+            "glyph": "sparkle",
+            "color": "#f2bc60",
+            "at": [-166, -29],
+            "velocity": [-23, -33],
+            "gravity": 16,
+            "spin": -48,
+            "size": 1.05
+          },
+          {
+            "glyph": "sparkle",
+            "color": "#ffe2a0",
+            "at": [169, -29],
+            "velocity": [24, -30],
+            "gravity": 15,
+            "spin": 44,
+            "delay": 0.08
+          },
+          {
+            "glyph": "sparkle",
+            "color": "#efac68",
+            "at": [174, 16],
+            "velocity": [21, -15],
+            "gravity": 25,
+            "spin": 70,
+            "delay": 0.17,
+            "size": 0.5
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -3 -11 Q -10 -1 -6 10", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#efbd70",
+            "at": [-169, 9],
+            "velocity": [-21, -19],
+            "gravity": 13,
+            "spin": -22,
+            "delay": 0.08
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 3 -11 Q 10 -1 6 10", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#efbd70",
+            "at": [172, -4],
+            "velocity": [24, -18],
+            "gravity": 16,
+            "spin": 23,
+            "delay": 0.12
+          }
+        ]
+      }
+    },
+    {
+      "id": "gleam",
+      "name": "Gleam",
+      "gloss": "A pale green glint and a short stroke flash beside the head, once.",
+      "burst": {
+        "duration": 0.85,
+        "particles": [
+          {
+            "glyph": "sparkle",
+            "color": "#cbe4bc",
+            "at": [171, -16],
+            "velocity": [24, -24],
+            "gravity": 14,
+            "spin": 56,
+            "size": 0.9
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -5 3 Q 0 0 5 1", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#94b994",
+            "at": [165, 8],
+            "velocity": [21, -10],
+            "spin": 30,
+            "delay": 0.12,
+            "size": 0.85
+          }
+        ]
+      }
+    },
+    {
+      "id": "victory-burst",
+      "name": "Victory burst",
+      "gloss": "Warm stars and confetti strokes burst out on both sides of the head, once.",
+      "burst": {
+        "duration": 1.1,
+        "particles": [
+          {
+            "glyph": "sparkle",
+            "color": "#efb957",
+            "at": [-162, -32],
+            "velocity": [-31, -43],
+            "gravity": 27,
+            "spin": -68,
+            "size": 1.15
+          },
+          {
+            "glyph": "sparkle",
+            "color": "#ffe3a4",
+            "at": [167, -32],
+            "velocity": [30, -40],
+            "gravity": 25,
+            "spin": 62,
+            "delay": 0.06,
+            "size": 1.08
+          },
+          {
+            "glyph": "sparkle",
+            "color": "#f3c777",
+            "at": [-169, 26],
+            "velocity": [-21, -26],
+            "gravity": 33,
+            "spin": -90,
+            "delay": 0.13,
+            "size": 0.54
+          },
+          {
+            "glyph": "sparkle",
+            "color": "#f0aa69",
+            "at": [175, 23],
+            "velocity": [20, -25],
+            "gravity": 33,
+            "spin": 96,
+            "delay": 0.18,
+            "size": 0.54
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 4 9 Q -1 0 -9 -6", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e69c62",
+            "at": [-168, -1],
+            "velocity": [-28, -24],
+            "gravity": 24,
+            "spin": -36,
+            "delay": 0.1,
+            "size": 0.9
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -4 9 Q 1 0 9 -6", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e8bd70",
+            "at": [169, -3],
+            "velocity": [29, -20],
+            "gravity": 25,
+            "spin": 37,
+            "delay": 0.12,
+            "size": 0.9
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -3 -5 L 2 -1 L -1 4", "stroke": "particle", "width": 3 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#e6ae6c",
+            "at": [-172, -8],
+            "velocity": [-22, -4],
+            "gravity": 43,
+            "spin": -105,
+            "delay": 0.2,
+            "size": 0.85
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 2 -5 L -2 0 L 3 4", "stroke": "particle", "width": 3 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#f2cf8b",
+            "at": [177, -4],
+            "velocity": [23, -6],
+            "gravity": 46,
+            "spin": 112,
+            "delay": 0.24,
+            "size": 0.85
+          }
+        ]
+      }
+    },
+    {
+      "id": "gloom-wisps",
+      "name": "Gloom wisps",
+      "gloss": "Blue wisps drift down on both sides of the head, once.",
+      "burst": {
+        "duration": 1.1,
+        "particles": [
+          {
+            "glyph": {
+              "paths": [{ "d": "M 0 -10 C -4 -2 4 5 0 14", "stroke": "particle", "width": 2.8 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#7d9eaf",
+            "at": [-170, -1],
+            "velocity": [-13, 3],
+            "gravity": 34,
+            "spin": -12
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 0 -8 C 3 -2 -3 4 0 12", "stroke": "particle", "width": 2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#a0b7c0",
+            "at": [-179, -14],
+            "velocity": [-17, 7],
+            "gravity": 28,
+            "spin": 9,
+            "delay": 0.17,
+            "size": 0.8
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M -1 -12 C 3 -4 -3 4 0 13", "stroke": "particle", "width": 2.8 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#7d9eaf",
+            "at": [170, 1],
+            "velocity": [14, 4],
+            "gravity": 36,
+            "spin": 13
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 0 -8 C -3 -1 3 3 0 11", "stroke": "particle", "width": 2 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#a0b7c0",
+            "at": [181, -12],
+            "velocity": [17, 6],
+            "gravity": 29,
+            "spin": -10,
+            "delay": 0.14,
+            "size": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "motion-strokes",
+      "name": "Motion strokes",
+      "gloss": "Two soft curved strokes swish out beside the head, once.",
+      "burst": {
+        "duration": 0.65,
+        "particles": [
+          {
+            "glyph": {
+              "paths": [{ "d": "M -3 -10 Q -10 0 -5 12", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#9eb8a5",
+            "at": [-168, -35],
+            "velocity": [-23, -20],
+            "gravity": 14,
+            "spin": -24,
+            "size": 0.9
+          },
+          {
+            "glyph": {
+              "paths": [{ "d": "M 3 -10 Q 10 0 5 12", "stroke": "particle", "width": 2.6 }],
+              "wake": 1.5,
+              "draw": true
+            },
+            "color": "#9eb8a5",
+            "at": [170, -23],
+            "velocity": [24, -18],
+            "gravity": 14,
+            "spin": 24,
+            "delay": 0.08,
+            "size": 0.9
+          }
+        ]
+      }
+    },
+    {
+      "id": "flush",
+      "name": "Flush",
+      "gloss": "The face reddens, easing in and out with the mood (Nemo's anger glaze).",
+      "shade": {
+        "enter": 0.22,
+        "exit": 0.22,
+        "over": "skin-shadow",
+        "fill": { "color": "#d94c43", "opacity": 0.28 }
+      }
+    },
+    {
+      "id": "gloom",
+      "name": "Gloom",
+      "gloss": "A cold blue shadow falls from the forehead through the upper face, with vertical lines of despair (Lose's gaku no kage).",
+      "shade": {
+        "enter": 0.18,
+        "exit": 0.28,
+        "over": "face-feature",
+        "fill": {
+          "from": [0, -78.55],
+          "to": [0, 97.82],
+          "stops": [
+            { "at": 0, "color": "#353e5c", "opacity": 0.78 },
+            { "at": 0.38, "color": "#566882", "opacity": 0.46 },
+            { "at": 0.72, "color": "#6b7c94", "opacity": 0 }
+          ]
+        },
+        "lines": [
+          {
+            "d": "M -55.64 -46.55 Q -57.09 -36.73 -56 -21.82",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M -43.27 -48.36 Q -44.73 -32.73 -42.91 -17.82",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M -31.27 -48.36 Q -32.36 -37.82 -30.91 -26.91",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M -19.27 -45.82 Q -20.36 -32.36 -19.27 -16",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M 21.45 -45.09 Q 20 -31.64 20.73 -20.73",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M 34.55 -41.09 Q 32.73 -27.27 34.18 -14.55",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M 47.64 -36 Q 46.18 -25.09 47.27 -13.82",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          },
+          {
+            "d": "M 60 -29.09 Q 58.91 -18.91 59.64 -7.27",
+            "color": "#414b68",
+            "width": 1.89,
+            "opacity": 0.58
+          }
+        ]
+      }
+    }
+  ]
+}

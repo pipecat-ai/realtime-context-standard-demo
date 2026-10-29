@@ -12,13 +12,23 @@ customer is done.
 
 ```
 Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
-    → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS)
+    → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS) → phone timer → avatar director
+    → lipsync
 ```
 
 - **Tone reader** reads each user turn, with the bot's line before it, for emotion and
   sarcasm. The LLM gets the reading with the user's message.
 - **Tone tagger** voices each sentence the LLM writes with the TTS's tags, breaths
   included.
+- **Phone timer** (`server/avatar/phones.py`) looks up the phones of each word the TTS
+  speaks (CMUdict, from `lipsync/`) and places them through the word's time, for the
+  avatar's lips: where they meet, round and spread.
+- **Avatar director** (`server/avatar/`) has [Jev](https://docs.typesafe.ai) read each
+  sentence Sam is about to speak, with the reply before it and the customer's last
+  message, and pick the client avatar's expression and gesture for it. A laugh or sigh
+  the tagger wrote is its own gesture. Without `TYPESAFE_API_KEY` it's left out.
+- **Lipsync** (`server/lipsync/`, from pipecat-visemes) reads the TTS audio for the
+  avatar's mouth shapes, and sends them ahead of the audio's playout.
 - **Tools** (`server/tools.py`) run against an in-memory order store seeded with three
   orders: `51077` (processing), `48213` (shipped) and `39560` (delivered). Any name
   that isn't one of theirs gets `51077`, so a demo always has an order to work with.
@@ -70,6 +80,7 @@ Server env, in `server/.env` (from `server/env.example`):
 | `CARTESIA_API_KEY`      | `tts` cartesia                                         |
 | `CARTESIA_VOICE_ID`     | `tts` cartesia, optional: defaults to an Emotive voice |
 | `HF_TOKEN`              | Optional: Hugging Face downloads. `detect_backchannels` true: read access to `pipecat-ai`, whose model is private for now, unless `hf auth login` has it |
+| `TYPESAFE_API_KEY`      | Optional: Jev, for the avatar's expressions and gestures |
 
 ### Evals
 
@@ -105,9 +116,22 @@ pipecat cloud organizations keys create --organization daily-demos   # pk_... fo
 ## Client
 
 Vite + React, built on the unreleased RTVI 2.3.0 Pipecat clients (vendored in
-`client/vendor/` by `client/scripts/vendor-pipecat.sh`). The stage shows the bot's
-voice on the ambient background; the side panel shows the transcript, tool calls
-and latency. Under each user line are the Tone reader's emotion and sarcasm; under
+`client/vendor/` by `client/scripts/vendor-pipecat.sh`). The stage shows Sam as an
+avatar on the ambient background; the side panel shows the transcript, tool calls
+and latency.
+
+The avatar is Momo, exported from Pipecat Character Studio: her data files are in
+`client/public/avatar/` and the runtime that plays them in `client/src/avatar-runtime/`.
+`client/scripts/use-avatar.sh <export folder>` copies in a newer export. Her mouth is
+shaped by `client/src/lib/mouth-shaper.ts` from the bot's lipsync batches and phones: it
+opens with the voice's loudness in a speaking range, its lips meet, round and spread
+where the phones say, timed against the analysis's closures, and every control is
+smoothed around the moment shown. `client/src/lib/lipsync-aligner.ts` keeps it on the
+voice as it's heard: it matches the batches' energy against the bot's audio as it plays,
+and delays the mouth by the lag between them. Each line's expression and gesture, from
+the avatar director, plays as the line is heard.
+
+Under each user line are the Tone reader's emotion and sarcasm; under
 each bot line, the line as it was voiced, rebuilt from `bot-output`'s delivery and
 the sounds and pauses performed. With the backchannel detector on, what the user
 said while Sam talked through it shows in a grey, dashed bubble labelled

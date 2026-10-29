@@ -10,7 +10,13 @@ A customer service voice agent for an outdoor gear shop, on a cascade pipeline
 with Pipecat Tone reading the user and voicing the bot:
 
     Deepgram Flux (STT) → Tone reader → PhoneLLM Mini on Baseten (LLM)
-        → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS)
+        → Tone tagger → ElevenLabs v4 Text-to-Dialogue (TTS) → lipsync
+
+The lipsync processor reads the bot's voice for its mouth shapes, which the
+client's avatar speaks with (``lipsync/``, from pipecat-visemes), and the
+phone timer times the phones of each word, which shape its lips. With a
+``TYPESAFE_API_KEY``, Jev reads each line Sam speaks for the avatar's expression
+and reaction (``avatar/``).
 
 Three start-time options, read from the ``/start`` request body, swap parts:
 
@@ -65,7 +71,9 @@ from pipecat.transports.daily.transport import DailyParams
 from pipecat.turns.user_mute import MuteUntilFirstBotCompleteUserMuteStrategy
 from pipecat.workers.runner import WorkerRunner
 
+from avatar import AvatarDirector, PhoneTimer
 from backchannel import BackchannelFluxSTTService
+from lipsync import LipsyncMessageRelay, LipsyncProcessor
 from meter import MoodMeter
 from tools import TOOLS, OrderStore
 
@@ -271,7 +279,15 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
             # tags the TTS performs. Without it, the LLM writes them.
             *([PipecatToneTagger()] if options.use_tagger else []),
             tts,
+            # The phones of each word spoken, which shape the avatar's lips.
+            PhoneTimer(),
+            # The avatar's expression and reaction for each line, from Jev.
+            *([AvatarDirector(context)] if os.getenv("TYPESAFE_API_KEY") else []),
+            # Mouth shapes from the TTS audio, sent ahead of its playout. The relay,
+            # after the transport, sends each batch to the client as it's due.
+            LipsyncProcessor(),
             transport.output(),
+            LipsyncMessageRelay(),
             assistant_aggregator,
         ]
     )

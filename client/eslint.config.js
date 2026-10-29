@@ -7,8 +7,12 @@ import { defineConfig, globalIgnores } from "eslint/config"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
-/** Registry code, kept as shipped; see AGENTS.md. Everything else is linted. */
+/**
+ * Registry code, kept as shipped (see AGENTS.md), and the avatar runtime, as
+ * Pipecat Character Studio exports it. Everything else is linted.
+ */
 const VENDORED = [
+  "src/avatar-runtime/**",
   "src/components/ui/**",
   "src/components/pipecat/**",
   "src/hooks/use-pipecat-*.ts",

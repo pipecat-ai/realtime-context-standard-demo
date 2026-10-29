@@ -3,7 +3,7 @@ import { usePipecatClientTransportState } from "@pipecat-ai/client-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
 
-import { BotVoiceBars } from "@/components/bot-voice-bars"
+import { BotAvatar } from "@/components/bot-avatar"
 import { BotAudioControl } from "@/components/pipecat/bot-audio"
 import { UserAudioControl } from "@/components/pipecat/user-audio-control"
 import { CallButton } from "@/components/call-button"
@@ -16,6 +16,7 @@ import {
 } from "@/glass"
 import { useAgentStatus } from "@/hooks/use-agent-status"
 import { cn } from "@/lib/utils"
+import { lipsync } from "@/stores/avatar-store"
 
 /** The Deepgram demo's outline button: a 1.5px white ring on no fill. */
 const OUTLINE_PILL =
@@ -39,7 +40,7 @@ interface StageProps {
   className?: string
 }
 
-/** The agent on the ambient background: its voice, status and call button. */
+/** The agent on the ambient background: its face, status and call button. */
 export function Stage({ connect, disconnect, error, className }: StageProps) {
   const transportState = usePipecatClientTransportState()
   const status = useAgentStatus()
@@ -48,30 +49,30 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
 
   return (
     <div className={cn("flex min-h-0 flex-col gap-3", className)}>
-      {/* Below lg a band of the screen, 30% of its height but never short
-          of the call button, leaving the rest to the panels; beside them,
-          all the height there is. */}
+      {/* Below lg a band of the screen, 40% of its height, enough for Sam's
+          lips to be read, but never short of the call button, leaving the
+          rest to the panels; beside them, all the height there is. */}
       <section
         aria-label="Voice agent"
-        className="on-ambient flex h-[30dvh] min-h-40 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1"
+        className="on-ambient flex h-[40dvh] min-h-40 flex-col overflow-hidden rounded-[28px] bg-card lg:h-auto lg:min-h-0 lg:flex-1"
       >
         <AmbientBackground
           palette={ambientPalette(paletteId)}
           className="flex min-h-0 flex-1 flex-col items-center p-4 sm:p-6"
         >
-          <div className="flex min-h-0 w-full flex-1 items-center justify-center">
-            <BotVoiceBars
-              status={status}
-              className="h-full max-h-105 w-[min(100%,640px)]"
-            />
-          </div>
+          <BotAvatar className="min-h-0 w-full flex-1" />
           <p role="status" className="readout-label mt-3" aria-live="polite">
             {error ?? status}
           </p>
           <CallButton
             status={status}
             connectable={connectable}
-            onClick={() => void (connectable ? connect() : disconnect())}
+            onClick={() => {
+              if (!connectable) return void disconnect()
+              // In the tap, so the browser lets the mouth hear the voice.
+              lipsync.resume()
+              void connect()
+            }}
             disabled={
               transportState === "initializing" ||
               transportState === "disconnecting"
