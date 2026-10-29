@@ -59,12 +59,6 @@ Deepgram Flux (STT) → Tone reader → avatar listener → PhoneLLM Mini on Bas
   the tagger wrote is its own gesture. Without `TYPESAFE_API_KEY` it's left out.
 - **Lipsync** (`server/lipsync/`, from pipecat-visemes) reads the TTS audio for the
   avatar's mouth shapes, and sends them ahead of the audio's playout.
-- **Cold-start guard** (`server/cold_start.py`, tagger mode) covers for PhoneLLM Mini
-  while it wakes, if Baseten has scaled it to zero: that takes about two minutes. When
-  a reply hasn't started four seconds after it was asked for, Sam says she's starting
-  up, and again every 30 seconds while the caller waits, and the client shows the
-  model waking, with a button to switch to LLM mode. Once the LLM first replies, the
-  guard stands down for the call.
 - **Tools** (`server/tools.py`) run against an in-memory order store seeded with three
   orders: `51077` (processing), `48213` (shipped) and `39560` (delivered). Any name
   that isn't one of theirs gets `51077`, so a demo always has an order to work with.
