@@ -20,4 +20,4 @@ audio_filter = "pro"
 
 # Warm agents kept ready for new sessions; each one is billed while idle.
 [scaling]
-min_agents = 1
+min_agents = 50
