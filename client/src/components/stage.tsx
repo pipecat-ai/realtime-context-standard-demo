@@ -1,5 +1,8 @@
 import type { TransportState } from "@pipecat-ai/client-js"
-import { usePipecatClientTransportState } from "@pipecat-ai/client-react"
+import {
+  usePipecatClientMicControl,
+  usePipecatClientTransportState,
+} from "@pipecat-ai/client-react"
 
 import { BotAvatar } from "@/components/bot-avatar"
 import { BotAudioControl } from "@/components/pipecat/bot-audio"
@@ -17,6 +20,16 @@ import { lipsync, useAvatarStore } from "@/stores/avatar-store"
 const OUTLINE_PILL =
   "border-[1.5px] dark:border-foreground/85 dark:bg-transparent"
 
+/**
+ * The mic's level bars: live green, or muted, dark on the pill's pink fill
+ * (styles/kit.css). The control's ghost variant would draw them pink, and the
+ * fill would hide them.
+ */
+const MIC_BARS = {
+  live: "--active-background",
+  muted: "--inactive-foreground",
+}
+
 /** States the call button can start a session from. */
 const CONNECTABLE: TransportState[] = ["initialized", "disconnected", "error"]
 
@@ -30,12 +43,13 @@ interface StageProps {
 /**
  * The agent on the ambient background, which washes to the mood of its
  * expression: its face over the call button, with its status and the mic,
- * volume and settings in the top corners.
+ * volume and settings in the top corners (on phones, just the mic).
  */
 export function Stage({ connect, disconnect, error, className }: StageProps) {
   const transportState = usePipecatClientTransportState()
   const status = useAgentStatus()
   const expression = useAvatarStore((state) => state.expression)
+  const { isMicEnabled } = usePipecatClientMicControl()
   const connectable = CONNECTABLE.includes(transportState)
 
   return (
@@ -55,23 +69,40 @@ export function Stage({ connect, disconnect, error, className }: StageProps) {
       >
         {/* Over the avatar's corners, in the background's padding, so the
             face keeps the full height. Lifted, since the avatar's mask
-            stacks it above anything unlifted before it. */}
+            stacks it above anything unlifted before it. Phones keep only the
+            mic, off Sam's face: the status is still announced, and shown
+            when it's an error; the phone has its own volume. */}
         <div className="absolute inset-x-4 top-4 z-10 flex flex-wrap items-center justify-between gap-3 sm:inset-x-6 sm:top-6">
-          <StatusBadge status={status} error={error} className="min-w-0" />
+          <StatusBadge
+            status={status}
+            expression={expression}
+            error={error}
+            // Without its min height, the hidden badge's glass is a speck.
+            className={cn("min-w-0", !error && "max-sm:sr-only max-sm:min-h-0")}
+          />
           {/* Right-aligned even when a long mic error wraps it under. */}
           <div className="ml-auto flex items-center gap-3">
-            <UserAudioControl variant="ghost" size="lg" />
+            <UserAudioControl
+              variant="ghost"
+              size="lg"
+              visualizerProps={{
+                barColor: isMicEnabled ? MIC_BARS.live : MIC_BARS.muted,
+              }}
+            />
             <BotAudioControl
               size="icon-lg"
               variant="outline"
               align="center"
               sliderProps={{ orientation: "vertical" }}
-              className={OUTLINE_PILL}
+              className={cn(OUTLINE_PILL, "max-sm:hidden")}
             />
-            <SettingsButton locked={!connectable} className={OUTLINE_PILL} />
+            <SettingsButton
+              locked={!connectable}
+              className={cn(OUTLINE_PILL, "max-sm:hidden")}
+            />
           </div>
         </div>
-        <BotAvatar className="min-h-0 w-full flex-1" />
+        <BotAvatar className="min-h-0 w-full flex-1 drop-shadow-avatar" />
         <CallButton
           status={status}
           connectable={connectable}

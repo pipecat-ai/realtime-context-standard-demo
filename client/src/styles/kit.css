@@ -18,8 +18,8 @@
 }
 
 /* The mic control (ghost buttons in a group): one outline pill as tall as
-   the volume button, pink while muted, a soft divider before the device
-   chevron. */
+   the volume button, filled pink while muted, a soft divider before the
+   device chevron. */
 [data-slot="user-audio-control"] {
   height: 2.25rem;
   overflow: hidden;
@@ -27,12 +27,21 @@
   border-radius: 9999px;
 }
 
+/* Muted, a fill with dark content: the ghost variant's pink outline and pink
+   text are hard to read on the ambient background. */
 [data-slot="user-audio-control"]:has(> [data-state="inactive"]) {
-  border-color: color-mix(
-    in oklab,
-    var(--inactive-background) 70%,
-    transparent
-  );
+  border-color: var(--inactive-background);
+  background: var(--inactive-background);
+}
+
+[data-slot="user-audio-control"]:has(> [data-state="inactive"]) > * {
+  color: var(--inactive-foreground);
+}
+
+[data-slot="user-audio-control"]:has(> [data-state="inactive"])
+  > *
+  + *::before {
+  background: color-mix(in oklab, var(--inactive-foreground) 25%, transparent);
 }
 
 [data-slot="user-audio-control"] > * {

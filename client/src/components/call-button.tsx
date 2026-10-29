@@ -1,6 +1,7 @@
 import { PhoneIcon, PlayIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
+import { RimSpark } from "@/components/rim-spark"
 import { GlassButton } from "@/glass"
 import type { AgentStatus } from "@/hooks/use-agent-status"
 import { cn } from "@/lib/utils"
@@ -58,6 +59,8 @@ export function CallButton({
         className
       )}
     >
+      {/* Draws the eye to it while there's no call. */}
+      {connectable && !disabled && <RimSpark />}
       <PhoneIcon
         className={cn(
           "size-5 fill-current text-active",

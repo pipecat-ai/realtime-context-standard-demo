@@ -56,6 +56,9 @@
   --color-tag-breath: var(--tag-breath);
   --color-tag-sound: var(--tag-sound);
   --color-tag-pause: var(--tag-pause);
+  /* Sam cast on the background: a hard, faint offset copy of her outline,
+     which lifts her off it. */
+  --drop-shadow-avatar: 6px 8px 0 rgb(0 0 0 / 0.15);
   /* A tool's cell lights up with each call and fades back. */
   --animate-tool-flash: tool-flash 0.7s ease-out;
 
@@ -78,6 +81,52 @@
         var(--active-background) 30%,
         transparent
       );
+    }
+  }
+  /* Now and then, while no call is up, a spark runs a lap of the Start
+     button's rim, easing off the mark and into the finish, and the button
+     flashes as it gets home (components/rim-spark.tsx). The three run on one
+     clock: the spark's run, its fade in and out, and the flash. */
+  --animate-rim-spark: rim-spark 6s 1.5s infinite;
+  --animate-rim-spark-fade: rim-spark-fade 6s 1.5s infinite;
+  --animate-rim-flash: rim-flash 6s 1.5s infinite;
+
+  /* A dash offset of 100 is one lap of a pathLength-100 rim. */
+  @keyframes rim-spark {
+    0% {
+      stroke-dashoffset: 0;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    26%,
+    100% {
+      stroke-dashoffset: 100;
+    }
+  }
+
+  @keyframes rim-spark-fade {
+    0%,
+    27%,
+    100% {
+      opacity: 0;
+    }
+    4%,
+    21% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes rim-flash {
+    0%,
+    24%,
+    100% {
+      opacity: 0;
+    }
+    27% {
+      opacity: 0.14;
+      animation-timing-function: ease-out;
+    }
+    40% {
+      opacity: 0;
     }
   }
 }
@@ -145,9 +194,10 @@
 }
 
 /* Over the ambient background: white text, and borders and fills that let
-   the palette show through. */
+   the palette show through; dark on a fill of a palette's glow. */
 .on-ambient {
   --foreground: #ffffff;
+  --glow-foreground: #0a0a0a;
   --muted-foreground: rgb(255 255 255 / 0.72);
   --border: rgb(255 255 255 / 0.2);
   --input: rgb(255 255 255 / 0.2);
