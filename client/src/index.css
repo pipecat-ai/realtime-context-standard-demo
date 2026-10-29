@@ -37,10 +37,12 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  /* The stage's corners, and the mode dialog's a little rounder around its
-     cards' 3xl. */
+  /* The stage's corners. The mode dialog's nest around its cards' 3xl, as
+     nested corners do: the card radius plus the dialog's padding (p-3, and
+     p-4 from sm). */
   --radius-stage: 1.75rem;
-  --radius-dialog: 2rem;
+  --radius-dialog: calc(var(--radius-3xl) + var(--spacing) * 3);
+  --radius-dialog-sm: calc(var(--radius-3xl) + var(--spacing) * 4);
   /* The tagged line and the mode cards' chips: as small as the readout
      labels. */
   --text-2xs: 0.625rem;
